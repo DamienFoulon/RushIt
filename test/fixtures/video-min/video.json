@@ -1,0 +1,14 @@
+{
+  "rushit": "0.1.0",
+  "durationSeconds": 4,
+  "format": { "width": 640, "height": 360, "fps": 30 },
+  "theme": {
+    "colors": { "bg": "#ffffff", "ink": "#111111", "accent": "#2255aa" },
+    "fonts": [],
+    "layout": {
+      "stage": { "left": 250, "top": 40, "width": 360, "height": 280 },
+      "window": { "width": 720, "height": 560 }
+    }
+  },
+  "sfx": []
+}
