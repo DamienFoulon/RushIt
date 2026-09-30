@@ -23,6 +23,7 @@ describe("VideoJson", () => {
   });
 
   it("accepte une vidéo sans colonne de texte", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { textColumn: _drop, ...layout } = minimal.theme.layout;
     const v = VideoJson.parse({ ...minimal, theme: { ...minimal.theme, layout } });
     expect(v.theme.layout.textColumn).toBeUndefined();

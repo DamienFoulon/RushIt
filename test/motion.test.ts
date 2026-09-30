@@ -8,6 +8,7 @@ describe("motion", () => {
     expect(progress(30, 10, 20)).toBe(1);
   });
   it("typed tape un caractère toutes les 2 images", () => expect(typed("Bonjour", 14, 10, 2)).toBe("Bo"));
+  it("typed n'affiche un caractère qu'une fois ses images écoulées", () => expect(typed("Bonjour", 15, 10, 2)).toBe("Bo"));
   it("shotAt interpole entre deux plans et tient le dernier", () => {
     const shots = [
       { at: 0, x: 0, y: 0, zoom: 1 },
