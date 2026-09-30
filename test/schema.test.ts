@@ -34,12 +34,30 @@ describe("VideoJson", () => {
     expect(() => VideoJson.parse(bad)).toThrow();
   });
 
+  const music = {
+    file: "audio/m.mp3", title: "T", artist: "A", licence: "CC BY 4.0", credit: "c",
+    creditRequired: true, pageUrl: "https://example.org", bpm: 100,
+    segments: [[0, 5]], downbeats: [0], outputDuration: 5,
+  };
+
+  it("accepte une musique bien formée", () => {
+    expect(VideoJson.parse({ ...minimal, music }).music?.segments).toEqual([[0, 5]]);
+  });
+
   it("refuse une musique dont les segments ne sont pas croissants", () => {
-    const music = {
-      file: "audio/m.mp3", title: "T", artist: "A", licence: "CC BY 4.0", credit: "c",
-      creditRequired: true, pageUrl: "https://example.org", bpm: 100,
-      segments: [[10, 5]], downbeats: [0], outputDuration: 5,
-    };
-    expect(() => VideoJson.parse({ ...minimal, music })).toThrow(/segment/);
+    expect(() => VideoJson.parse({ ...minimal, music: { ...music, segments: [[10, 5]] } })).toThrow(/segment/);
+  });
+
+  it("refuse un segment vide", () => {
+    expect(() => VideoJson.parse({ ...minimal, music: { ...music, segments: [[5, 5]] } })).toThrow(/segment/);
+  });
+
+  it("refuse une musique sans segment", () => {
+    expect(() => VideoJson.parse({ ...minimal, music: { ...music, segments: [] } })).toThrow();
+  });
+
+  it("refuse une affiche placée avant le début", () => {
+    expect(VideoJson.parse({ ...minimal, posterSeconds: 0 }).posterSeconds).toBe(0);
+    expect(() => VideoJson.parse({ ...minimal, posterSeconds: -1 })).toThrow();
   });
 });

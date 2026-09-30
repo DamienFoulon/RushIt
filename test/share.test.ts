@@ -21,6 +21,35 @@ describe("manifeste", () => {
   it("signale un fichier altéré", () => expect(verifyManifest({ "video.json": strToU8("{ }") }, m)).toEqual(["video.json"]));
   it("conseille de s'aligner quand la version diffère", () => expect(versionAdvice(m, "0.2.0", "abc")).toMatch(/0\.1\.0/));
   it("ne conseille rien quand tout est aligné", () => expect(versionAdvice(m, "0.1.0", "abc")).toBeNull());
+  it("signale un fichier déclaré mais absent", () => expect(verifyManifest({}, m)).toEqual(["video.json"]));
+  it("signale un fichier présent mais non déclaré", () =>
+    expect(verifyManifest({ ...files, "intrus.txt": strToU8("x") }, m)).toEqual(["intrus.txt"]));
+  it("conseille de s'aligner quand seul le verrou diffère, à la même version", () =>
+    expect(versionAdvice(m, "0.1.0", "def")).toMatch(/verrou abc/));
+  it("donne la commande qui revient à la version de la vidéo, pas à celle de la machine", () =>
+    expect(versionAdvice(m, "0.2.0", "def")?.split("\n")).toContain("Pour un rendu identique : git fetch --tags && git checkout v0.1.0 && npm ci"));
+});
+
+describe("import, fichiers manquants ou en trop", () => {
+  /** An exported zip, altered by `edit` on its entries, manifest left as exported. */
+  const altered = (edit: (entries: Record<string, Uint8Array>) => void) => {
+    const zip = path.join(tmp(), "demo.rushit.zip");
+    exportVideo(withVideo(), zip);
+    const entries = unzipSync(readFileSync(zip));
+    edit(entries);
+    writeFileSync(zip, zipSync(entries));
+    return zip;
+  };
+
+  it("refuse un fichier déclaré dans le manifeste mais absent du zip", () => {
+    const zip = altered((e) => delete e["demo/rules.md"]);
+    expect(() => importVideo(zip, { root: tmp() })).toThrow(/manquants[\s\S]*rules\.md/);
+  });
+
+  it("refuse un fichier présent dans le zip mais non déclaré", () => {
+    const zip = altered((e) => (e["demo/intrus.txt"] = strToU8("x")));
+    expect(() => importVideo(zip, { root: tmp() })).toThrow(/en trop[\s\S]*intrus\.txt/);
+  });
 });
 
 describe("export puis import", () => {
@@ -30,6 +59,18 @@ describe("export puis import", () => {
     const root = tmp();
     const r = importVideo(zip, { root });
     expect(readFileSync(path.join(r.dir, "video.json"), "utf8")).toBe(readFileSync("test/fixtures/video-min/video.json", "utf8"));
+  });
+
+  it("laisse de côté les rendus intermédiaires", () => {
+    const dir = withVideo();
+    mkdirSync(path.join(dir, "out"));
+    writeFileSync(path.join(dir, "out/demo.raw.mp4"), "intermédiaire");
+    writeFileSync(path.join(dir, "out/demo.mp4"), "final");
+    const zip = path.join(tmp(), "demo.rushit.zip");
+    exportVideo(dir, zip);
+    const entries = Object.keys(unzipSync(readFileSync(zip)));
+    expect(entries).toContain("demo/out/demo.mp4");
+    expect(entries).not.toContain("demo/out/demo.raw.mp4");
   });
 
   it("refuse une vidéo qui existe déjà, sauf --as", () => {

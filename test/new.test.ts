@@ -23,6 +23,15 @@ describe("createVideo", () => {
     expect(r.renamed).toBe(true);
   });
 
+  it("ne signale pas de renommage pour un nom déjà sûr", async () => {
+    const r = await createVideo({ name: "demo", rules: "neutre", root: root() });
+    expect(r.renamed).toBe(false);
+  });
+
+  it("refuse clairement un nom dont il ne reste rien", async () => {
+    await expect(createVideo({ name: "!!!", rules: "neutre", root: root() })).rejects.toThrow(/Nom de vidéo inutilisable : « !!! »/);
+  });
+
   it("refuse d'écraser une vidéo existante", async () => {
     const dir = root();
     await createVideo({ name: "demo", rules: "neutre", root: dir });
