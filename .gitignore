@@ -1,0 +1,7 @@
+node_modules
+videos/
+*.rushit.zip
+out/
+# Les morceaux ne se redistribuent pas seuls : ils voyagent dans le zip d'une vidéo.
+examples/*/audio/*.mp3
+examples/*/out/
