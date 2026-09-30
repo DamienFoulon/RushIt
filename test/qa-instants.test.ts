@@ -26,6 +26,17 @@ describe("sampleFrames", () => {
     const only = sampleFrames({ timed, fps: 30, totalFrames: 120, stepSeconds: 0.5, scene: "b" });
     expect(Math.min(...only)).toBeGreaterThanOrEqual(60);
   });
+  it("--scene borne les instants au début et à la fin de la scène", () => {
+    // A line that settles after its scene ends (55 + 12 > 60) stays out of it.
+    const three = [timed[0], { ...timed[1], textsAt: [0, 55] }, { id: "c", from: 120, durationInFrames: 60, textsAt: [0] }];
+    const only = sampleFrames({ timed: three, fps: 30, totalFrames: 180, stepSeconds: 0.5, scene: "b" });
+    expect(only).toEqual([60, 63, 72, 75, 90, 105, 116]);
+    const first = sampleFrames({ timed: three, fps: 30, totalFrames: 180, stepSeconds: 0.5, scene: "a" });
+    expect(first).toEqual([0, 3, 12, 15, 30, 42, 45, 56]);
+  });
+  it("refuse une scène inconnue", () => {
+    expect(() => sampleFrames({ timed, fps: 30, totalFrames: 120, stepSeconds: 0.5, scene: "z" })).toThrow(/Scène inconnue : z/);
+  });
 });
 
 describe("boundFrames", () => {
