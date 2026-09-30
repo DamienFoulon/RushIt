@@ -1,5 +1,5 @@
-import path from "node:path";
 import { Config } from "@remotion/cli/config";
+import { rushitWebpackOverride } from "./tools/lib/webpack";
 
 // The current video is a folder chosen by RUSHIT_VIDEO_DIR, which the tools
 // set: it is both Remotion's public dir (staticFile) and the target of the
@@ -13,14 +13,4 @@ if (videoDir) Config.setPublicDir(videoDir);
 Config.setChromiumOpenGlRenderer("swiftshader");
 Config.setVideoImageFormat("png");
 Config.setOverwriteOutput(true);
-Config.overrideWebpackConfig((config) => ({
-  ...config,
-  resolve: {
-    ...config.resolve,
-    alias: {
-      ...(config.resolve?.alias as Record<string, string>),
-      ...(videoDir ? { "@video": videoDir } : {}),
-      "rushit/kit": path.resolve(process.cwd(), "kit/index.ts"),
-    },
-  },
-}));
+Config.overrideWebpackConfig(rushitWebpackOverride(videoDir));

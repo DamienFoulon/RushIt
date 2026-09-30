@@ -18,9 +18,11 @@
     "lint": "eslint kit tools src test && tsc"
   },
   "dependencies": {
+    "@remotion/bundler": "4.0.530",
     "@remotion/cli": "4.0.530",
     "@remotion/fonts": "4.0.530",
     "@remotion/media": "4.0.530",
+    "@remotion/renderer": "4.0.530",
     "essentia.js": "0.1.3",
     "fflate": "0.8.3",
     "react": "19.2.8",
