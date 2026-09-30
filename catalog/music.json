@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "beauty-flow",
+    "title": "Beauty Flow",
+    "artist": "Kevin MacLeod",
+    "licence": "CC BY 4.0",
+    "credit": "\"Beauty Flow\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 License http://creativecommons.org/licenses/by/4.0/",
+    "creditRequired": true,
+    "pageUrl": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900008",
+    "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Beauty%20Flow.mp3",
+    "sha256": "4e72161775f158116f55a419a6b8bfc846c27d4f876413d1859d78cf377d9c40"
+  },
+  {
+    "slug": "newer-wave",
+    "title": "Newer Wave",
+    "artist": "Kevin MacLeod",
+    "licence": "CC BY 4.0",
+    "credit": "\"Newer Wave\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 License http://creativecommons.org/licenses/by/4.0/",
+    "creditRequired": true,
+    "pageUrl": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2000024"
+  },
+  {
+    "slug": "ambient-corporate-inspiring",
+    "title": "Ambient Corporate Inspiring Motivate Music",
+    "artist": "331music",
+    "licence": "Pixabay Content License",
+    "credit": "Music: \"Ambient Corporate Inspiring Motivate Music\" by 331music (Pixabay)",
+    "creditRequired": false,
+    "pageUrl": "https://pixabay.com/music/corporate-ambient-corporate-inspiring-motivate-music-591997/"
+  },
+  {
+    "slug": "corporate-explainer-video",
+    "title": "Corporate Explainer Video",
+    "artist": "alex-morgan",
+    "licence": "Pixabay Content License",
+    "credit": "Music: \"Corporate Explainer Video\" by alex-morgan (Pixabay)",
+    "creditRequired": false,
+    "pageUrl": "https://pixabay.com/music/corporate-corporate-explainer-video-568180/"
+  },
+  {
+    "slug": "ambient-electronic",
+    "title": "Ambient Electronic Ambient",
+    "artist": "AudioDollar",
+    "licence": "Pixabay Content License",
+    "credit": "Music: \"Ambient Electronic Ambient\" by AudioDollar (Pixabay)",
+    "creditRequired": false,
+    "pageUrl": "https://pixabay.com/music/corporate-ambient-electronic-ambient-532665/"
+  },
+  {
+    "slug": "soft-circuit-flow",
+    "title": "Soft Circuit Flow - Modern Ambient Background Music",
+    "artist": "MindfulLiving",
+    "licence": "Pixabay Content License",
+    "credit": "Music: \"Soft Circuit Flow - Modern Ambient Background Music\" by MindfulLiving (Pixabay)",
+    "creditRequired": false,
+    "pageUrl": "https://pixabay.com/music/ambient-soft-circuit-flow-modern-ambient-background-music-469975/"
+  },
+  {
+    "slug": "technology",
+    "title": "Technology",
+    "artist": "The_Mountain",
+    "licence": "Pixabay Content License",
+    "credit": "Music: \"Technology\" by The_Mountain (Pixabay)",
+    "creditRequired": false,
+    "pageUrl": "https://pixabay.com/music/techno-trance-technology-562622/"
+  }
+]

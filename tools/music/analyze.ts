@@ -49,5 +49,12 @@ export const analyzeTrack = (
         distance: (a, b) => featureDistance(barFeatures(signal, SR, a - bar, a), barFeatures(signal, SR, b, b + bar)),
       });
   const outputDuration = edit.segments.reduce((s, [a, b]) => s + (b - a), 0);
-  return { bpm: grid.bpm, segments: edit.segments, downbeats: toOutputDownbeats(downbeats, edit.segments), outputDuration, warning: edit.warning };
+  return {
+    bpm: grid.bpm,
+    segments: edit.segments,
+    downbeats: toOutputDownbeats(downbeats, edit.segments),
+    beats: toOutputDownbeats(grid.beats.map((t) => t + shift), edit.segments),
+    outputDuration,
+    warning: edit.warning,
+  };
 };

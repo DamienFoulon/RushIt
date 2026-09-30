@@ -47,3 +47,15 @@ export const toOutputDownbeats = (downbeats: readonly number[], segments: readon
   }
   return [...new Set(out)];
 };
+
+/**
+ * The same beats grouped in bars one way further along: `n` beats later, or
+ * earlier when negative. Four beats is a whole bar, so the grid comes back.
+ * The current phase is read from the beat nearest the first downbeat.
+ */
+export const shiftDownbeats = (beats: readonly number[], downbeats: readonly number[], n: number): number[] => {
+  if (beats.length === 0 || downbeats.length === 0) return [...downbeats];
+  const first = beats.reduce((best, t, i) => (Math.abs(t - downbeats[0]) < Math.abs(beats[best] - downbeats[0]) ? i : best), 0);
+  const phase = (((first + n) % 4) + 4) % 4;
+  return beats.filter((_, i) => i % 4 === phase);
+};

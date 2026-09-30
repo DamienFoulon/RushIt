@@ -37,6 +37,8 @@ export const Music = z
     segments: z.array(z.tuple([z.number().min(0), z.number()])).min(1),
     /** Bar starts, in output seconds. */
     downbeats: z.array(z.number()),
+    /** Every beat, in output seconds: what `music -- shift` regroups in bars. Written by `music add`. */
+    beats: z.array(z.number()).optional(),
     outputDuration: z.number().positive(),
   })
   .refine((m) => m.segments.every(([a, b]) => b > a), { message: "chaque segment doit finir après son début" });
