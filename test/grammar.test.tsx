@@ -30,6 +30,10 @@ describe("frameOn", () => {
     const shot = frameOn(box, layout);
     expect([shot.x, shot.y]).toEqual([500, 200]);
   });
+  it("laisse 56 px de marge par défaut", () => {
+    expect(frameOn(box, layout)).toEqual(frameOn(box, layout, 56));
+    expect(frameOn(box, layout)).not.toEqual(frameOn(box, layout, 40));
+  });
   it("laisse la marge demandée à l'écran, sur le côté qui borne le zoom", () => {
     const shot = frameOn(box, layout, 56);
     const a = onStage(shot, box.left, box.top);
