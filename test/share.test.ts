@@ -1,13 +1,14 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import { exportVideo } from "../tools/export";
 import { importVideo } from "../tools/import";
 import { buildManifest, type Manifest, verifyManifest, versionAdvice } from "../tools/share/manifest";
+import { tempDirs } from "./helpers/tmp";
 
-const tmp = () => mkdtempSync(path.join(tmpdir(), "rushit-share-"));
+const tmp = tempDirs("rushit-share-");
+
 const withVideo = () => {
   const dir = path.join(tmp(), "demo");
   cpSync("test/fixtures/video-min", dir, { recursive: true });

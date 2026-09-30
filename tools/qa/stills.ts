@@ -1,3 +1,4 @@
+import { rmSync } from "node:fs";
 import { cpus } from "node:os";
 import http from "node:http";
 import path from "node:path";
@@ -10,6 +11,8 @@ export type Session = {
   render(frames: readonly number[], outDir: string): Promise<ProbeReport[]>;
   totalFrames: number;
   fps: number;
+  /** The webpack bundle, removed by close(). */
+  bundleDir: string;
   close(): Promise<void>;
 };
 
@@ -33,13 +36,32 @@ export const openSession = async (videoDir: string): Promise<Session> => {
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const { port } = server.address() as { port: number };
   const inputProps = { qa: { endpoint: `http://127.0.0.1:${port}/qa` } };
-  const serveUrl = await bundle({ entryPoint, publicDir: videoDir, webpackOverride: rushitWebpackOverride(videoDir) });
-  const browser = await openBrowser("chrome", { chromiumOptions: { gl: "swiftshader" }, logLevel: "error" });
-  const composition = await selectComposition({ serveUrl, id: "Film", inputProps, puppeteerInstance: browser, logLevel: "error" });
+  let serveUrl: string | null = null;
+  let browser: Awaited<ReturnType<typeof openBrowser>> | null = null;
+  // The bundle weighs some 30 MB in the temporary folder: it leaves with the session, failed or not.
+  const release = async () => {
+    try {
+      await browser?.close({ silent: true });
+    } finally {
+      server.close();
+      if (serveUrl) rmSync(serveUrl, { recursive: true, force: true });
+    }
+  };
+  let composition: Awaited<ReturnType<typeof selectComposition>>;
+  try {
+    serveUrl = await bundle({ entryPoint, publicDir: videoDir, webpackOverride: rushitWebpackOverride(videoDir) });
+    browser = await openBrowser("chrome", { chromiumOptions: { gl: "swiftshader" }, logLevel: "error" });
+    composition = await selectComposition({ serveUrl, id: "Film", inputProps, puppeteerInstance: browser, logLevel: "error" });
+  } catch (e) {
+    await release();
+    throw e;
+  }
+  const url = serveUrl;
+  const chrome = browser;
 
   const one = async (frame: number, outDir: string): Promise<ProbeReport> => {
     await renderStill({
-      serveUrl, composition, frame, inputProps, puppeteerInstance: browser,
+      serveUrl: url, composition, frame, inputProps, puppeteerInstance: chrome,
       output: path.join(outDir, `frame-${frame}.png`), overwrite: true,
       chromiumOptions: { gl: "swiftshader" }, logLevel: "error",
     });
@@ -49,6 +71,7 @@ export const openSession = async (videoDir: string): Promise<Session> => {
     return r;
   };
 
+  let closed = false;
   return {
     totalFrames: composition.durationInFrames,
     fps: composition.fps,
@@ -58,9 +81,11 @@ export const openSession = async (videoDir: string): Promise<Session> => {
       for (let i = 0; i < frames.length; i += n) out.push(...(await Promise.all(frames.slice(i, i + n).map((f) => one(f, outDir)))));
       return out;
     },
+    bundleDir: url,
     async close() {
-      await browser.close({ silent: true });
-      server.close();
+      if (closed) return;
+      closed = true;
+      await release();
     },
   };
 };

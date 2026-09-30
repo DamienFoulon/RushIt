@@ -1,11 +1,13 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { repoRoot } from "../tools/lib/paths";
 import { remotionEnv, remotionFfmpegDir } from "../tools/lib/remotion";
 import { renderVideo } from "../tools/render";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-render-");
 
 /** Video frames of a file, counted by the ffprobe Remotion ships. */
 const frameCount = (file: string): number => {
@@ -20,7 +22,7 @@ const frameCount = (file: string): number => {
 
 describe("renderVideo", () => {
   it("rend la vidéo minimale et son affiche", async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "rushit-render-"));
+    const dir = tmp();
     cpSync("test/fixtures/video-min", dir, { recursive: true });
     const r = await renderVideo(dir);
     expect(statSync(r.mp4).size).toBeGreaterThan(1000);
@@ -30,7 +32,7 @@ describe("renderVideo", () => {
   }, 300_000);
 
   it("refuse de rendre quand une police déclarée manque, en la nommant", async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "rushit-render-"));
+    const dir = tmp();
     cpSync("test/fixtures/video-min", dir, { recursive: true });
     const json = path.join(dir, "video.json");
     const v = JSON.parse(readFileSync(json, "utf8"));
@@ -40,7 +42,7 @@ describe("renderVideo", () => {
   });
 
   it("arrête le rendu quand une police déclarée est illisible, en la nommant, sans repli silencieux", () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "rushit-render-"));
+    const dir = tmp();
     cpSync("test/fixtures/video-min", dir, { recursive: true });
     writeFileSync(path.join(dir, "assets/fonts/casse.woff2"), Buffer.from("ceci n'est pas une police".repeat(40)));
     const json = path.join(dir, "video.json");

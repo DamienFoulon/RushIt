@@ -1,11 +1,13 @@
-import { cpSync, existsSync, mkdtempSync, readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runCheck } from "../tools/check";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-check-");
 
 const copy = (fixture: string) => {
-  const dir = path.join(mkdtempSync(path.join(tmpdir(), "rushit-check-")), fixture);
+  const dir = path.join(tmp(), fixture);
   cpSync(path.join("test/fixtures", fixture), dir, { recursive: true });
   return dir;
 };

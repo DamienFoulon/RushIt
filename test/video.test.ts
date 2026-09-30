@@ -1,8 +1,10 @@
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkAssets, readVideo, writeVideo } from "../tools/lib/video";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-video-");
 
 const video = {
   rushit: "0.1.0",
@@ -19,8 +21,6 @@ const video = {
   },
   sfx: [],
 };
-
-const tmp = () => mkdtempSync(path.join(tmpdir(), "rushit-video-"));
 
 describe("readVideo / writeVideo", () => {
   it("relit ce qu'il a écrit", () => {

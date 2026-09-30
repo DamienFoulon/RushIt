@@ -1,10 +1,10 @@
-import { existsSync, mkdtempSync, readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { createVideo, slugify } from "../tools/new";
+import { tempDirs } from "./helpers/tmp";
 
-const root = () => mkdtempSync(path.join(tmpdir(), "rushit-new-"));
+const root = tempDirs("rushit-new-");
 
 describe("slugify", () => {
   it("rend un nom de dossier sûr", () => expect(slugify("Présentation Atelier !")).toBe("presentation-atelier"));

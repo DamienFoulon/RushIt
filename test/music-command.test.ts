@@ -1,9 +1,11 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { readCatalog } from "../tools/music";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-music-");
 
 const music = (dir: string, ...args: string[]) =>
   execFileSync("npx", ["tsx", "tools/music.ts", ...args.slice(0, 1), "--dir", dir, ...args.slice(1)], { encoding: "utf8" });
@@ -16,7 +18,7 @@ const failure = (dir: string, ...args: string[]) => {
 };
 
 const videoMin = () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "rushit-music-"));
+  const dir = tmp();
   cpSync("test/fixtures/video-min", dir, { recursive: true });
   return dir;
 };

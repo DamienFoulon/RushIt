@@ -1,9 +1,11 @@
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ProbeReport } from "../kit/qa/types";
 import { openSession, type Session } from "../tools/qa/stills";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-qa-");
 
 let session: Session;
 let reports: Map<number, ProbeReport>;
@@ -12,7 +14,7 @@ const at = (sceneIndex: number) => sceneIndex * 30 + 15;
 beforeAll(async () => {
   session = await openSession(path.resolve("test/fixtures/qa-defects"));
   const frames = Array.from({ length: 12 }, (_, i) => at(i));
-  const out = mkdtempSync(path.join(tmpdir(), "rushit-qa-"));
+  const out = tmp();
   reports = new Map((await session.render(frames, out)).map((r) => [r.frame, r]));
 }, 300_000);
 afterAll(() => session?.close());
@@ -64,5 +66,13 @@ describe("mesure dans la page", () => {
     const e = expectFact(3, "rogne");
     expect(e.scene).toBe("rogne");
     expect(e.visible).toEqual([90, 119]);
+  });
+});
+
+describe("fermeture", () => {
+  it("la session supprime son bundle", async () => {
+    expect(existsSync(session.bundleDir)).toBe(true);
+    await session.close();
+    expect(existsSync(session.bundleDir)).toBe(false);
   });
 });

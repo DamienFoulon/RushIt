@@ -1,9 +1,11 @@
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildEditWav, EDIT_RATE, encodeWav } from "../tools/music/edit-wav";
 import { checkAssets, readVideo } from "../tools/lib/video";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-editwav-");
 
 /** A 440 Hz sine, stereo, 44.1 kHz: resampled to 48 kHz by the decoder, like any track. */
 const sine = (seconds: number, rate = 44_100): Int16Array => {
@@ -25,7 +27,7 @@ const leftOf = (wav: Buffer) => {
  * sit on different phases of the sine: without a fade, the join jumps.
  */
 const videoWithSine = (segments: [number, number][]) => {
-  const dir = mkdtempSync(path.join(tmpdir(), "rushit-editwav-"));
+  const dir = tmp();
   mkdirSync(path.join(dir, "audio"));
   writeFileSync(path.join(dir, "audio/sinus.wav"), encodeWav(sine(10), 44_100));
   const video = JSON.parse(readFileSync("test/fixtures/video-min/video.json", "utf8"));

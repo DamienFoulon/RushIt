@@ -1,5 +1,3 @@
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { exportVideo } from "../tools/export";
@@ -7,14 +5,17 @@ import { fileSha256, mediaHashes } from "../tools/hashes";
 import { importVideo } from "../tools/import";
 import { createVideo } from "../tools/new";
 import { renderVideo } from "../tools/render";
+import { tempDirs } from "./helpers/tmp";
+
+const tmp = tempDirs("rushit-e2e-");
 
 describe.skipIf(process.env.RUSHIT_E2E !== "1")("reproductibilité", () => {
   it("Carnet : mêmes images et même son avant et après export puis import", async () => {
-    const a = await createVideo({ name: "carnet-a", rules: "neutre", from: "carnet", root: mkdtempSync(path.join(tmpdir(), "rushit-e2e-")) });
+    const a = await createVideo({ name: "carnet-a", rules: "neutre", from: "carnet", root: tmp() });
     const first = await renderVideo(a.dir, { scale: 1 / 3, skipCheck: true });
-    const zip = path.join(tmpdir(), `carnet-${Date.now()}.rushit.zip`);
+    const zip = path.join(tmp(), "carnet.rushit.zip");
     exportVideo(a.dir, zip);
-    const b = importVideo(zip, { root: mkdtempSync(path.join(tmpdir(), "rushit-e2e-")) });
+    const b = importVideo(zip, { root: tmp() });
     const second = await renderVideo(b.dir, { scale: 1 / 3, skipCheck: true });
 
     const [x, y] = [await mediaHashes(first.mp4), await mediaHashes(second.mp4)];
