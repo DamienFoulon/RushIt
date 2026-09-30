@@ -10,7 +10,7 @@ const videoDir = process.env.RUSHIT_VIDEO_DIR;
 
 Config.setEntryPoint("src/index.ts");
 if (videoDir) Config.setPublicDir(videoDir);
-Config.setChromiumOpenGlRenderer("swangle");
+Config.setChromiumOpenGlRenderer("swiftshader");
 Config.setVideoImageFormat("png");
 Config.setOverwriteOutput(true);
 Config.overrideWebpackConfig((config) => ({
