@@ -24,6 +24,36 @@ const inside = (b: Box, l: number, t: number, w: number, h: number) => b.x >= l 
 const textElement = (t: TextFact) => ({ selector: t.selector, text: t.text });
 const textKey = (t: TextFact) => `${t.selector}|${t.text}`;
 
+/**
+ * A line typed letter by letter shows a new prefix on every frame. Each prefix
+ * is named after the complete text it grows into, so that the element gives one
+ * finding per check. A prefix only grows into a text it never sits next to: two
+ * texts shown together on one frame are two elements, the short one stays apart.
+ */
+const typedTexts = (reports: readonly ProbeReport[]) => {
+  const group = (t: TextFact) => `${t.scene ?? ""}|${t.selector}`;
+  const frames = new Map<string, Map<string, Set<number>>>();
+  for (const r of reports)
+    for (const t of r.texts) {
+      const texts = frames.get(group(t)) ?? new Map<string, Set<number>>();
+      texts.set(t.text, (texts.get(t.text) ?? new Set()).add(r.frame));
+      frames.set(group(t), texts);
+    }
+  const complete = new Map<string, string>();
+  for (const [g, texts] of frames)
+    for (const [short, seen] of texts) {
+      const longer = [...texts.keys()]
+        .filter((long) => long.length > short.length && long.startsWith(short) && ![...texts.get(long)!].some((f) => seen.has(f)))
+        .sort((a, b) => b.length - a.length);
+      // Only one line of growth: "Rap" in "Rappeler" and "Rapport" belongs to neither.
+      if (longer.length && longer.every((l) => longer[0].startsWith(l))) complete.set(`${g}|${short}`, longer[0]);
+    }
+  return (t: TextFact): TextFact => {
+    const full = complete.get(`${group(t)}|${t.text}`);
+    return full === undefined ? t : { ...t, text: full };
+  };
+};
+
 const expectRaw = (e: ExpectFact, frame: number): Raw | null => {
   const base = { check: "attente" as const, scene: e.scene, frame, element: { selector: `[data-rushit-expect=${e.id}]`, text: "" }, elementKey: `expect:${e.id}`, allowed: [], reasons: [], boxes: [e.box, ...e.related].filter(Boolean) as Box[] };
   const within = (r: [number, number] | null) => !!r && frame >= r[0] && frame <= r[1];
@@ -59,6 +89,7 @@ export const analyze = ({
   const raws: Raw[] = [];
   const sorted = [...reports].sort((a, b) => a.frame - b.frame);
   const expectScenes = new Map<string, Set<string>>();
+  const named = typedTexts(sorted);
 
   for (const r of sorted) {
     const seenHere = new Set<string>();
@@ -74,7 +105,7 @@ export const analyze = ({
     for (const o of r.overlaps)
       raws.push({ check: "chevauchement", scene: o.a.split("|")[0] || null, frame: r.frame, element: { selector: o.a.split("|")[1], text: `${o.a.split("|")[2]} / ${o.b.split("|")[2]}` }, elementKey: [o.a, o.b].sort().join(" & "), cause: `${o.area} px² de recouvrement`, boxes: o.boxes, allowed: [], reasons: [] });
     for (const t of r.texts) {
-      const base = { scene: t.scene, frame: r.frame, element: textElement(t), elementKey: textKey(t), boxes: [t.box], allowed: t.allowed, reasons: t.reasons };
+      const base = { scene: t.scene, frame: r.frame, element: textElement(named(t)), elementKey: textKey(named(t)), boxes: [t.box], allowed: t.allowed, reasons: t.reasons };
       if (t.overflow || t.clippedBy) raws.push({ ...base, check: "coupe", cause: t.clippedBy ? `coupé par ${t.clippedBy}` : "déborde de son bloc" });
       if (t.inFrame < 0.9) raws.push({ ...base, check: "hors-cadre", cause: `${pct(1 - t.inFrame)} hors de l'image` });
       if (t.fontPx < rules.minTextPx) raws.push({ ...base, check: "petit-texte", cause: `${t.fontPx} px à l'écran (minimum ${rules.minTextPx})` });

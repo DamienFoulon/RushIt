@@ -72,6 +72,20 @@ describe("analyze", () => {
     expect(f[0].cause).toMatch(/vu sur 3 images/);
   });
 
+  it("un texte en train de se taper ne donne qu'un signalement par contrôle, au nom du texte complet", () => {
+    const typing = ["Rap", "Rappeler le", "Rappeler le fournisseur"].map((t, i) => report(i * 15, { texts: [text({ key: `s|p|${t}`, text: t, words: t.split(" ").length, fontPx: 10 })] }));
+    const f = run(typing).filter((x) => x.check === "petit-texte");
+    expect(f).toHaveLength(1);
+    expect(f[0].element.text).toBe("Rappeler le fournisseur");
+    expect(f[0].cause).toMatch(/vu sur 3 images/);
+  });
+
+  it("un petit texte stable reste signalé, même à côté d'un texte qui le prolonge", () => {
+    const both = [0, 15].map((fr) => report(fr, { texts: [text({ key: "s|p|Oui", text: "Oui", fontPx: 10 }), text({ key: "s|p|Oui, bien sûr", text: "Oui, bien sûr", words: 3, fontPx: 10 })] }));
+    const f = run(both).filter((x) => x.check === "petit-texte");
+    expect(f.map((x) => x.element.text).sort()).toEqual(["Oui", "Oui, bien sûr"]);
+  });
+
   it("acceptation par fichier, et orpheline", () => {
     const id = findingId("petit-texte", "s", "p|Bonjour");
     const acc = [{ id, check: "petit-texte", scene: "s", element: "p|Bonjour", reason: "voulu", date: "2026-09-30" }];
