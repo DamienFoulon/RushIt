@@ -1,7 +1,11 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const docs = ["AGENTS.md", "README.md", ...[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `method/0${n}`)];
+/** Every text an agent or a person reads: the method sheets, AGENTS.md and README.md. */
+const texts = ["AGENTS.md", "README.md", ...readdirSync("method").map((f) => `method/${f}`)];
+
+/** The prose of a Markdown text: code blocks and code spans left out. */
+const prose = (md: string) => md.replace(/^```[\s\S]*?^```/gm, "").replace(/`[^`\n]*`/g, "");
 
 describe("documents", () => {
   it("chaque fiche de méthode existe", () => {
@@ -16,11 +20,15 @@ describe("documents", () => {
   });
 
   it("aucun tiret cadratin ni point-virgule entre propositions dans les textes", () => {
-    for (const d of ["AGENTS.md", "README.md"]) expect(readFileSync(d, "utf8")).not.toMatch(/—/);
+    expect(texts.filter((d) => d.startsWith("method/"))).toHaveLength(8);
+    for (const d of texts) {
+      const text = prose(readFileSync(d, "utf8"));
+      expect(text, d).not.toMatch(/—/);
+      expect(text, d).not.toMatch(/ ; |; \p{Ll}/u);
+    }
   });
 
   it("CLAUDE.md et GEMINI.md renvoient vers AGENTS.md", () => {
     for (const f of ["CLAUDE.md", "GEMINI.md"]) expect(readFileSync(f, "utf8")).toMatch(/AGENTS\.md/);
   });
-  void docs;
 });
