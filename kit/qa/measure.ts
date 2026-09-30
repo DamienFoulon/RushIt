@@ -141,6 +141,36 @@ const allowedOf = (el: Element) => {
   return { allowed, reasons };
 };
 
+/** True when the element's own transform, rotate or scale changes the shape of what it draws (a translation does not). */
+const distorts = (el: Element): boolean => {
+  const cs = getComputedStyle(el);
+  if (cs.rotate !== "none" && parseFloat(cs.rotate) !== 0) return true;
+  if (cs.scale !== "none" && !cs.scale.split(" ").every((v) => parseFloat(v) === 1)) return true;
+  if (cs.transform === "none") return false;
+  const m = new DOMMatrix(cs.transform);
+  return !(m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1);
+};
+
+/** The element itself or its nearest ancestor that rotates or scales what it holds, or null. */
+const distortingAncestor = (el: Element): Element | null => {
+  for (let e: Element | null = el; e && e !== document.body; e = e.parentElement) if (distorts(e)) return e;
+  return null;
+};
+
+/**
+ * Text rectangles measured in the frame of `frame`, its own rotation and scale
+ * neutralized for the time of the measure. Screen rectangles are axis-aligned:
+ * on a tilted card they grow and meet while the lines do not touch.
+ */
+const rectsInFrame = (frame: Element, els: Element[]): Map<Element, DOMRect[]> => {
+  const h = frame as HTMLElement;
+  const saved = h.style.cssText;
+  for (const p of ["transform", "rotate", "scale"]) h.style.setProperty(p, "none", "important");
+  const out = new Map(els.map((el) => [el, textRects(el)]));
+  h.style.cssText = saved;
+  return out;
+};
+
 const range = (v?: string): [number, number] | null => (v ? (v.split(",").map(Number) as [number, number]) : null);
 
 /** Everything the check needs to judge this frame. Pure facts: no threshold here. */
@@ -220,6 +250,13 @@ export const measure = (frame: number, doc: Document = document): ProbeReport =>
     };
   });
 
+  // Texts on the same rotated or scaled card are compared in the card's frame, the others on screen.
+  const frameOf = new Map(blocks.map((b) => [b.el, distortingAncestor(b.el)]));
+  const byFrame = new Map<Element, Element[]>();
+  for (const [el, f] of frameOf) if (f) byFrame.set(f, [...(byFrame.get(f) ?? []), el]);
+  const local = new Map<Element, DOMRect[]>();
+  for (const [f, els] of byFrame) if (els.length > 1) for (const [el, rects] of rectsInFrame(f, els)) local.set(el, rects);
+
   const overlaps: OverlapFact[] = [];
   const layered = (el: Element) => allowedOf(el).allowed.includes("chevauchement");
   for (let i = 0; i < blocks.length; i++)
@@ -227,9 +264,10 @@ export const measure = (frame: number, doc: Document = document): ProbeReport =>
       const a = blocks[i];
       const b = blocks[j];
       if (a.el.contains(b.el) || b.el.contains(a.el) || layered(a.el) || layered(b.el)) continue;
+      const shared = frameOf.get(a.el) !== null && frameOf.get(a.el) === frameOf.get(b.el);
       let area = 0;
-      for (const ra of a.rects)
-        for (const rb of b.rects)
+      for (const ra of shared ? local.get(a.el)! : a.rects)
+        for (const rb of shared ? local.get(b.el)! : b.rects)
           area += Math.max(0, Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left)) * Math.max(0, Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top));
       if (area > 4) overlaps.push({ a: keyOf(a.el), b: keyOf(b.el), area: Math.round(area), boxes: [toBox(a.box), toBox(b.box)] });
     }

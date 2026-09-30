@@ -22,6 +22,15 @@ const expectFact = (i: number, id: string) => reports.get(at(i))!.expects.find((
 describe("mesure dans la page", () => {
   it("rapporte chaque image demandée", () => expect(reports.size).toBe(12));
   it("voit le chevauchement", () => expect(reports.get(at(0))!.overlaps.length).toBeGreaterThan(0));
+  it("voit le chevauchement de deux cartes tournées différentes", () => {
+    const o = reports.get(at(0))!.overlaps;
+    expect(o.some((x) => [x.a, x.b].some((k) => k.includes("Carte penchée A")) && [x.a, x.b].some((k) => k.includes("Carte penchée B")))).toBe(true);
+  });
+  it("mesure dans le repère de la carte : deux lignes proches d'une carte tournée ne se chevauchent pas", () => {
+    const clean = reports.get(at(11))!;
+    expect(clean.texts.some((t) => t.text === "Ligne juste-dessous")).toBe(true);
+    expect(clean.overlaps).toEqual([]);
+  });
   it("voit le texte coupé", () => expect(reports.get(at(1))!.texts.some((t) => t.overflow || t.clippedBy)).toBe(true));
   it("voit le texte hors cadre", () => expect(reports.get(at(2))!.texts.some((t) => t.inFrame < 0.9)).toBe(true));
   it("voit l'élément rogné et par qui", () => {
