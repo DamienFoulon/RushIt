@@ -31,6 +31,7 @@ export const TextColumnLines: React.FC<Props & { column: NonNullable<Layout["tex
       {texts.map((text, i) => (
         <p
           key={text}
+          data-rushit-column=""
           style={{
             margin: 0, fontSize: 60, lineHeight: 1.12, fontWeight: 600, letterSpacing: "-0.025em",
             textWrap: "balance", color: i === 0 ? "var(--title, var(--ink))" : "var(--accent, var(--ink))",

@@ -11,3 +11,6 @@ export * from "./TextColumn";
 export * from "./Soundtrack";
 export * from "./Film";
 export * from "./Animatic";
+export * from "./qa/Expect";
+export * from "./qa/Allow";
+export * from "./qa/SceneContext";

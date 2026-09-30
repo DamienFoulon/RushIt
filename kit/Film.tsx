@@ -3,6 +3,7 @@ import type { VideoDefinition } from "./definition";
 import type { VideoJson } from "./schema";
 import { Soundtrack } from "./Soundtrack";
 import { TextColumn } from "./TextColumn";
+import { SceneContext } from "./qa/SceneContext";
 import { ThemeProvider } from "./theme";
 import { framesPerBeat, timeScenes } from "./timing";
 
@@ -26,10 +27,12 @@ export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> =
           const Scene = scene.component;
           return (
             <Sequence key={t.id} from={t.from} durationInFrames={t.durationInFrames} layout="none">
-              <AbsoluteFill>
-                <Scene duration={t.durationInFrames} beat={beat} textsAt={t.textsAt} />
-                <TextColumn texts={scene.texts} textsAt={t.textsAt} />
-              </AbsoluteFill>
+              <SceneContext.Provider value={{ id: t.id, from: t.from }}>
+                <AbsoluteFill data-rushit-scene={t.id}>
+                  <Scene duration={t.durationInFrames} beat={beat} textsAt={t.textsAt} />
+                  <TextColumn texts={scene.texts} textsAt={t.textsAt} />
+                </AbsoluteFill>
+              </SceneContext.Provider>
             </Sequence>
           );
         })}
