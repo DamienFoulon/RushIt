@@ -4,6 +4,7 @@ import { fail, output, parseArgs } from "./lib/cli";
 import { repoRoot, videosDir } from "./lib/paths";
 import { readVideo } from "./lib/video";
 import { fetchToFile, readCatalog } from "./music";
+import { buildEditWav } from "./music/edit-wav";
 
 type Rules = "createur" | "neutre" | "miennes" | "vides";
 const RULES: Rules[] = ["createur", "neutre", "miennes", "vides"];
@@ -38,6 +39,8 @@ export const createVideo = async (opts: { name: string; rules: Rules; from?: str
     if (!entry?.downloadUrl) throw new Error(`Morceau absent et sans lien de téléchargement : ${video.music.file}`);
     await fetchToFile(entry.downloadUrl, path.join(dir, video.music.file), entry.sha256);
   }
+  // The edit is assembled from the track, never shipped with the example.
+  if (video.music && (!video.music.edited || !existsSync(path.join(dir, video.music.edited)))) buildEditWav(dir);
   return { name, dir, renamed: name !== opts.name };
 };
 

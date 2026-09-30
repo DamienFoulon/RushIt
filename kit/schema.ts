@@ -26,6 +26,8 @@ export const Theme = z.object({
 export const Music = z
   .object({
     file: z.string(),
+    /** The edit, assembled once as a WAV by `music add`: what the film plays when present. */
+    edited: z.string().optional(),
     title: z.string(),
     artist: z.string(),
     licence: z.string(),

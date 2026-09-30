@@ -4,5 +4,6 @@ videos/
 out/
 # Les morceaux ne se redistribuent pas seuls : ils voyagent dans le zip d'une vidéo.
 examples/*/audio/*.mp3
+examples/*/audio/*.edit.wav
 examples/*/out/
 .vitest/

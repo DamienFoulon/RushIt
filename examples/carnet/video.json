@@ -22,6 +22,7 @@
   },
   "music": {
     "file": "audio/beauty-flow.mp3",
+    "edited": "audio/beauty-flow.edit.wav",
     "title": "Beauty Flow",
     "artist": "Kevin MacLeod",
     "licence": "CC BY 4.0",

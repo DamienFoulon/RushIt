@@ -27,3 +27,4 @@ S'il faut corriger :
 - La grille des mesures est une proposition, jamais une vérité. Seule l'écoute de l'humain la valide.
 - Certains morceaux du catalogue n'ont pas de lien de téléchargement. L'humain le télécharge depuis la page du morceau, puis on passe le fichier avec `--licence` et `--credit`.
 - Sans `--licence`, `music add` refuse. Ne jamais inventer une licence.
+- `music add` assemble le montage une fois pour toutes dans `audio/<morceau>.edit.wav`, que le film joue d'un bout à l'autre. Ne pas modifier ce fichier à la main : changer le montage passe par `music add`.

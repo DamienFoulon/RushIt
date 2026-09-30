@@ -5,6 +5,7 @@ import { fail, output, parseArgs } from "./lib/cli";
 import { repoRoot, videoDir } from "./lib/paths";
 import { readVideo, writeVideo } from "./lib/video";
 import { analyzeTrack } from "./music/analyze";
+import { buildEditWav } from "./music/edit-wav";
 import { shiftDownbeats } from "./music/edit";
 
 export type CatalogEntry = {
@@ -94,6 +95,8 @@ const main = async () => {
     outputDuration: Math.round(r.outputDuration * 1000) / 1000,
   };
   writeVideo(dir, video);
+  buildEditWav(dir);
+  video.music = readVideo(dir).music ?? video.music;
   writeFileSync(path.join(dir, "audio/LICENCE.txt"), `${video.music.title}, ${video.music.artist}\n${licence}\n${video.music.credit}\n${video.music.pageUrl}\n`);
   output(
     json,
@@ -101,6 +104,7 @@ const main = async () => {
       `Morceau : ${video.music.title} (${video.music.bpm} BPM)`,
       `Montage proposé : ${r.segments.map(([a, b]) => `${a.toFixed(2)}–${b.toFixed(2)} s`).join(" puis ")}`,
       `Durée du film : ${video.music.outputDuration} s`,
+      `Montage assemblé : ${video.music.edited}`,
       r.warning ? `Attention : ${r.warning}` : "",
       "À écouter dans l'animatique (npm run studio) avant de construire les scènes.",
       `Si le témoin de mesure tombe à côté dans l'animatique : ${shiftCommand}`,

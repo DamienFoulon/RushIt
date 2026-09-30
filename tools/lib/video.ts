@@ -14,6 +14,6 @@ export const writeVideo = (dir: string, v: VideoJson) =>
 
 /** Files video.json declares that the folder does not hold, in declaration order. */
 export const checkAssets = (dir: string, v: VideoJson): string[] =>
-  [...v.theme.fonts.map((f) => f.file), ...(v.music ? [v.music.file] : [])].filter(
+  [...v.theme.fonts.map((f) => f.file), ...(v.music ? [v.music.file, ...(v.music.edited ? [v.music.edited] : [])] : [])].filter(
     (rel) => !existsSync(path.join(dir, rel)),
   );
