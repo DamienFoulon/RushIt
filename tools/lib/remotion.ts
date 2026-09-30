@@ -1,5 +1,9 @@
 import { execFileSync, spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
+import path from "node:path";
 import { repoRoot } from "./paths";
+
+const require = createRequire(import.meta.url);
 
 export const remotionEnv = (dir: string): NodeJS.ProcessEnv => ({ ...process.env, RUSHIT_VIDEO_DIR: dir });
 
@@ -9,11 +13,44 @@ export const runRemotion = (args: string[], dir: string) => {
   if (r.status !== 0) throw new Error(`remotion ${args[0]} a échoué (code ${r.status})`);
 };
 
-/** The ffmpeg Remotion ships: no system install needed. */
-export const remotionFfmpeg = (args: string[], opts: { input?: Buffer } = {}): Buffer =>
-  execFileSync("npx", ["remotion", "ffmpeg", ...args], {
+const isMusl = (): boolean => {
+  const header = (process.report?.getReport() as { header?: { glibcVersionRuntime?: string } } | undefined)?.header;
+  return !header?.glibcVersionRuntime;
+};
+
+/** Name of the compositor package Remotion installs for this machine. */
+const compositorPackage = (): string => {
+  const { platform, arch } = process;
+  if (platform === "linux") return `@remotion/compositor-linux-${arch}-${isMusl() ? "musl" : "gnu"}`;
+  if (platform === "darwin") return `@remotion/compositor-darwin-${arch}`;
+  if (platform === "win32") return `@remotion/compositor-win32-${arch}-msvc`;
+  return `@remotion/compositor-${platform}-${arch}`;
+};
+
+/** Folder holding Remotion's ffmpeg and the libraries it loads. */
+export const remotionFfmpegDir = (): string => {
+  const pkg = compositorPackage();
+  try {
+    return path.dirname(require.resolve(`${pkg}/package.json`));
+  } catch {
+    throw new Error(`ffmpeg de Remotion introuvable : le paquet ${pkg} n'est pas installé (relancer npm ci).`);
+  }
+};
+
+/**
+ * The ffmpeg Remotion ships: no system install needed. Called directly rather
+ * than through `npx remotion ffmpeg`, which loads remotion.config.ts and so
+ * needs a current video.
+ */
+export const remotionFfmpeg = (args: string[], opts: { input?: Buffer } = {}): Buffer => {
+  const dir = remotionFfmpegDir();
+  const libraryPath = process.platform === "darwin" ? "DYLD_LIBRARY_PATH" : "LD_LIBRARY_PATH";
+  const inherited = process.env[libraryPath];
+  return execFileSync(path.join(dir, process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"), args, {
     cwd: repoRoot,
+    env: { ...process.env, [libraryPath]: inherited ? `${dir}${path.delimiter}${inherited}` : dir },
     input: opts.input,
     maxBuffer: 1024 * 1024 * 1024,
     stdio: ["pipe", "pipe", "pipe"],
   });
+};
