@@ -6,6 +6,9 @@ import { TextColumn } from "./TextColumn";
 import { ThemeProvider } from "./theme";
 import { framesPerBeat, timeScenes } from "./timing";
 
+/** The music credit shown over the last scene, or null when the licence does not require one. */
+export const creditText = (video: VideoJson): string | null => (video.music?.creditRequired ? video.music.credit : null);
+
 /** The film: every scene of the definition on the grid of the video's track. */
 export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> = ({ video, definition }) => {
   const { fps } = useVideoConfig();
@@ -13,6 +16,7 @@ export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> =
   const timed = timeScenes(definition.scenes, grid, fps);
   const beat = framesPerBeat(video.music?.bpm, fps);
   const creditFrom = timed[timed.length - 1]?.from ?? 0;
+  const credit = creditText(video);
   return (
     <ThemeProvider theme={video.theme}>
       <AbsoluteFill style={{ background: "var(--bg)", color: "var(--ink)" }}>
@@ -29,10 +33,10 @@ export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> =
             </Sequence>
           );
         })}
-        {video.music?.creditRequired && (
+        {credit !== null && (
           <Sequence from={creditFrom} layout="none">
             <div style={{ position: "absolute", left: 0, right: 0, bottom: 32, textAlign: "center", fontSize: 16, color: "var(--muted, var(--ink))" }}>
-              {video.music.credit}
+              {credit}
             </div>
           </Sequence>
         )}
