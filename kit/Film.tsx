@@ -3,6 +3,7 @@ import type { VideoDefinition } from "./definition";
 import type { VideoJson } from "./schema";
 import { Soundtrack } from "./Soundtrack";
 import { TextColumn } from "./TextColumn";
+import { Probe } from "./qa/Probe";
 import { SceneContext } from "./qa/SceneContext";
 import { ThemeProvider } from "./theme";
 import { framesPerBeat, timeScenes } from "./timing";
@@ -10,8 +11,11 @@ import { framesPerBeat, timeScenes } from "./timing";
 /** The music credit shown over the last scene, or null when the licence does not require one. */
 export const creditText = (video: VideoJson): string | null => (video.music?.creditRequired ? video.music.credit : null);
 
-/** The film: every scene of the definition on the grid of the video's track. */
-export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> = ({ video, definition }) => {
+/**
+ * The film: every scene of the definition on the grid of the video's track.
+ * With the `qa` input prop, the check's probe measures each frame it renders.
+ */
+export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition; qa?: { endpoint: string } }> = ({ video, definition, qa }) => {
   const { fps } = useVideoConfig();
   const grid = video.music ?? { downbeats: [], outputDuration: video.durationSeconds };
   const timed = timeScenes(definition.scenes, grid, fps);
@@ -43,6 +47,7 @@ export const Film: React.FC<{ video: VideoJson; definition: VideoDefinition }> =
             </div>
           </Sequence>
         )}
+        {qa && <Probe endpoint={qa.endpoint} />}
       </AbsoluteFill>
     </ThemeProvider>
   );
