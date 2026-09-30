@@ -21,3 +21,12 @@ describe("racine Remotion", () => {
     expect(statSync(png).size).toBeGreaterThan(100);
   }, 180_000);
 });
+
+describe("configuration Remotion", () => {
+  it("laisse passer les commandes générales sans vidéo sélectionnée", () => {
+    const bare = { ...process.env };
+    delete bare.RUSHIT_VIDEO_DIR;
+    const out = execFileSync("npx", ["remotion", "versions"], { env: bare, encoding: "utf8", stdio: "pipe" });
+    expect(out).toMatch(/4\.0\.530/);
+  }, 180_000);
+});
