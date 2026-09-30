@@ -37,18 +37,27 @@ export const remotionFfmpegDir = (): string => {
   }
 };
 
+/** A binary Remotion ships (`ffmpeg`, `ffprobe`), with the environment that finds its libraries. */
+export const remotionBinary = (name: "ffmpeg" | "ffprobe") => {
+  const dir = remotionFfmpegDir();
+  const libraryPath = process.platform === "darwin" ? "DYLD_LIBRARY_PATH" : "LD_LIBRARY_PATH";
+  const inherited = process.env[libraryPath];
+  return {
+    file: path.join(dir, process.platform === "win32" ? `${name}.exe` : name),
+    env: { ...process.env, [libraryPath]: inherited ? `${dir}${path.delimiter}${inherited}` : dir },
+  };
+};
+
 /**
  * The ffmpeg Remotion ships: no system install needed. Called directly rather
  * than through `npx remotion ffmpeg`, which loads remotion.config.ts and so
  * needs a current video.
  */
 export const remotionFfmpeg = (args: string[], opts: { input?: Buffer } = {}): Buffer => {
-  const dir = remotionFfmpegDir();
-  const libraryPath = process.platform === "darwin" ? "DYLD_LIBRARY_PATH" : "LD_LIBRARY_PATH";
-  const inherited = process.env[libraryPath];
-  return execFileSync(path.join(dir, process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"), args, {
+  const { file, env } = remotionBinary("ffmpeg");
+  return execFileSync(file, args, {
     cwd: repoRoot,
-    env: { ...process.env, [libraryPath]: inherited ? `${dir}${path.delimiter}${inherited}` : dir },
+    env,
     input: opts.input,
     maxBuffer: 1024 * 1024 * 1024,
     stdio: ["pipe", "pipe", "pipe"],

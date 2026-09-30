@@ -5,7 +5,7 @@ import { remotionFfmpeg } from "../lib/remotion";
  * raw PCM muxer, so it writes 16-bit WAV and the samples are read from the
  * `data` chunk (its size field is not filled in when ffmpeg writes to a pipe).
  */
-const decodePcm16 = (file: string, channels: number, sampleRate: number): Buffer => {
+export const decodePcm16 = (file: string, channels: number, sampleRate: number): Buffer => {
   const wav = remotionFfmpeg(["-v", "error", "-i", file, "-ac", String(channels), "-ar", String(sampleRate), "-c:a", "pcm_s16le", "-f", "wav", "-"]);
   if (wav.toString("ascii", 0, 4) !== "RIFF") throw new Error(`Pas de données audio dans ${file}`);
   let at = 12;

@@ -13,6 +13,7 @@
     "render": "tsx tools/render.ts",
     "export": "tsx tools/export.ts",
     "import": "tsx tools/import.ts",
+    "hashes": "tsx tools/hashes.ts",
     "test": "vitest run",
     "lint": "eslint kit tools src test && tsc"
   },
