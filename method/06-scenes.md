@@ -22,9 +22,9 @@ Des scènes finies, une par fichier dans `scenes/`, qui suivent le scénario et 
 Elle regarde une image toutes les 0,5 s (`--every <s>` pour changer ce pas), plus les instants clés : le début et la fin de chaque scène, l'apparition de chaque ligne de la colonne de texte. Elle signale :
 
 - en erreur : un texte qui en chevauche un autre (`chevauchement`), un texte coupé par son bloc (`coupe`), un texte qui sort de l'image (`hors-cadre`), une attente non tenue (`attente`)
-- en avertissement : un texte trop petit à l'écran (`petit-texte`), un contraste trop faible (`contraste`), un texte qui ne reste pas assez longtemps pour être lu (`lecture`), un texte posé hors de la colonne et de la zone de la scène (`zone`).
+- en avertissement : un texte trop petit à l'écran (`petit-texte`), un contraste trop faible (`contraste`), un texte qui ne reste pas assez longtemps pour être lu (`lecture`), un texte posé hors de la colonne et de la zone de la scène (`zone`), un texte à moins de 32 px du bord de la fenêtre qui le contient ou de l'image (`marge`).
 
-Les seuils et les niveaux viennent de la section « Seuils de la passe de contrôle » de `rules.md`. Sans elle, les seuils neutres s'appliquent : 0,3 s par mot, 24 px, contraste de 4,5.
+Les seuils et les niveaux viennent de la section « Seuils de la passe de contrôle » de `rules.md`. Sans elle, les seuils neutres s'appliquent : 0,3 s par mot, 24 px, contraste de 4,5, marge de 32 px (ligne `- marge minimale : 32 px`).
 
 ### Dire ce qui doit se voir : `Expect`
 

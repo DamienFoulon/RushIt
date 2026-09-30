@@ -1,6 +1,6 @@
 {
   "rushit": "0.1.0",
-  "durationSeconds": 12,
+  "durationSeconds": 13,
   "format": { "width": 1280, "height": 720, "fps": 30 },
   "theme": {
     "colors": { "bg": "#ffffff", "ink": "#111111", "accent": "#2255aa" },

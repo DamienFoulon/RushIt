@@ -13,7 +13,7 @@ const at = (sceneIndex: number) => sceneIndex * 30 + 15;
 
 beforeAll(async () => {
   session = await openSession(path.resolve("test/fixtures/qa-defects"));
-  const frames = Array.from({ length: 12 }, (_, i) => at(i));
+  const frames = Array.from({ length: 13 }, (_, i) => at(i));
   const out = tmp();
   reports = new Map((await session.render(frames, out)).map((r) => [r.frame, r]));
 }, 300_000);
@@ -22,7 +22,7 @@ afterAll(() => session?.close());
 const expectFact = (i: number, id: string) => reports.get(at(i))!.expects.find((e) => e.id === id)!;
 
 describe("mesure dans la page", () => {
-  it("rapporte chaque image demandée", () => expect(reports.size).toBe(12));
+  it("rapporte chaque image demandée", () => expect(reports.size).toBe(13));
   it("voit le chevauchement", () => expect(reports.get(at(0))!.overlaps.length).toBeGreaterThan(0));
   it("voit le chevauchement de deux cartes tournées différentes", () => {
     const o = reports.get(at(0))!.overlaps;
@@ -61,6 +61,10 @@ describe("mesure dans la page", () => {
     const clean = reports.get(at(11))!;
     expect(clean.texts.find((t) => t.text === "Détail accepté")!.allowed).toContain("petit-texte");
     expect(clean.overlaps.every((o) => !o.a.includes("Superposition") && !o.b.includes("Superposition"))).toBe(true);
+  });
+  it("mesure la marge au bord du conteneur qui rogne", () => {
+    expect(reports.get(at(12))!.texts.find((x) => x.text === "Collé au bord")!.margin).toBeCloseTo(8, 0);
+    expect(reports.get(at(11))!.texts.find((x) => x.text === "Carte tournée")!.margin).toBeGreaterThan(100);
   });
   it("attribue chaque fait à sa scène et donne les bornes absolues", () => {
     const e = expectFact(3, "rogne");

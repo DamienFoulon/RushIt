@@ -1,4 +1,4 @@
-export const CHECKS = ["attente", "chevauchement", "coupe", "hors-cadre", "petit-texte", "contraste", "lecture", "zone"] as const;
+export const CHECKS = ["attente", "chevauchement", "coupe", "hors-cadre", "petit-texte", "contraste", "lecture", "zone", "marge"] as const;
 export type CheckName = (typeof CHECKS)[number];
 export type Level = "erreur" | "avertissement" | "ignoré";
 
@@ -6,6 +6,8 @@ export type QaRules = {
   secondsPerWord: number;
   minTextPx: number;
   minContrast: number;
+  /** Closest a text may come to the edge of the window that holds it, in screen pixels. */
+  minMarginPx: number;
   levels: Record<CheckName, Level>;
   /** Lines of the section that could not be read, kept as they were written. */
   problems: string[];
@@ -15,9 +17,11 @@ export const DEFAULT_RULES: QaRules = {
   secondsPerWord: 0.3,
   minTextPx: 24,
   minContrast: 4.5,
+  minMarginPx: 32,
   levels: {
     attente: "erreur", chevauchement: "erreur", coupe: "erreur", "hors-cadre": "erreur",
     "petit-texte": "avertissement", contraste: "avertissement", lecture: "avertissement", zone: "avertissement",
+    marge: "avertissement",
   },
   problems: [],
 };
@@ -37,11 +41,12 @@ export const parseQaRules = (markdown: string): QaRules => {
     if (!line) continue;
     const [key, value = ""] = line.split(/\s*:\s*/, 2);
     const k = key.toLowerCase();
-    if (k === "lecture" || k === "taille de texte minimale" || k === "contraste minimal") {
+    if (k === "lecture" || k === "taille de texte minimale" || k === "contraste minimal" || k === "marge minimale") {
       const n = number(value);
       if (Number.isNaN(n)) rules.problems.push(line);
       else if (k === "lecture") rules.secondsPerWord = n;
       else if (k === "taille de texte minimale") rules.minTextPx = n;
+      else if (k === "marge minimale") rules.minMarginPx = n;
       else rules.minContrast = n;
     } else if (k === "sévérité") {
       for (const part of value.split(",")) {

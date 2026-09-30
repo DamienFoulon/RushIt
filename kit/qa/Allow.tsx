@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** Mirrors tools/qa/rules.ts CHECKS, minus "attente", which cannot be allowed. */
-export type AllowableCheck = "chevauchement" | "coupe" | "hors-cadre" | "petit-texte" | "contraste" | "lecture" | "zone";
+export type AllowableCheck = "chevauchement" | "coupe" | "hors-cadre" | "petit-texte" | "contraste" | "lecture" | "zone" | "marge";
 
 /** Accepts, for everything inside, the named checks. The reason shows in the report. */
 export const Allow: React.FC<{ checks: readonly AllowableCheck[]; reason: string; children: ReactNode }> = ({ checks, reason, children }) => (

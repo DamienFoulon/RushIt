@@ -8,7 +8,7 @@ const layout = { textColumn: { left: 40, width: 360 }, stage: { left: 440, top: 
 const text = (over: Partial<TextFact>): TextFact => ({
   key: "s|p|Bonjour", scene: "s", selector: "p", text: "Bonjour", words: 1, column: false,
   box: { x: 500, y: 100, w: 200, h: 40 }, inFrame: 1, opacity: 1, fontPx: 32, bold: false,
-  overflow: false, clippedBy: null, contrast: 12, allowed: [], reasons: [], ...over,
+  overflow: false, clippedBy: null, margin: 100, contrast: 12, allowed: [], reasons: [], ...over,
 });
 const report = (frame: number, over: Partial<ProbeReport> = {}): ProbeReport => ({ frame, width: 1280, height: 720, expects: [], texts: [], overlaps: [], ...over });
 const run = (reports: ProbeReport[], extra: Partial<Parameters<typeof analyze>[0]> = {}) =>
@@ -56,6 +56,19 @@ describe("analyze", () => {
     const { textColumn: _drop, ...noColumn } = layout;
     void _drop;
     expect(run([report(0, { texts: [text({ box: { x: 400, y: 680, w: 200, h: 30 } })] })], { layout: noColumn })).toEqual([]);
+  });
+
+  it("marge : texte trop près du bord de sa fenêtre", () => {
+    const f = run([report(0, { texts: [text({ margin: 10 })] })]);
+    expect(f).toHaveLength(1);
+    expect(f[0]).toMatchObject({ check: "marge", level: "avertissement" });
+    expect(f[0].cause).toMatch(/à 10 px du bord de sa fenêtre \(minimum 32\)/);
+    expect(run([report(0, { texts: [text({ margin: 40 })] })])).toEqual([]);
+  });
+
+  it("marge : rien pour une ligne de colonne, ni pour un texte entièrement hors cadre", () => {
+    expect(run([report(0, { texts: [text({ margin: 10, column: true, box: { x: 40, y: 100, w: 300, h: 40 } })] })])).toEqual([]);
+    expect(run([report(0, { texts: [text({ margin: -300, inFrame: 0 })] })]).map((f) => f.check)).toEqual(["hors-cadre"]);
   });
 
   it("lecture : trop court, et texte tapé ignoré", () => {

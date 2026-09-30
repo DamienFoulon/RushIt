@@ -64,6 +64,21 @@ const clippingAncestors = (el: Element): HTMLElement[] => {
   return out;
 };
 
+/**
+ * Shortest distance from the text box to an edge of what frames it: its nearest
+ * ancestor that clips (overflow other than visible), cut to the image, or the
+ * image itself. Negative when the text passes that edge.
+ */
+const marginOf = (el: Element, box: DOMRect, W: number, H: number): number => {
+  const clipper = clippingAncestors(el).find((c) => getComputedStyle(c).overflow !== "visible");
+  const r = clipper?.getBoundingClientRect();
+  const left = Math.max(0, r?.left ?? 0);
+  const top = Math.max(0, r?.top ?? 0);
+  const right = Math.min(W, r?.right ?? W);
+  const bottom = Math.min(H, r?.bottom ?? H);
+  return Math.round(Math.min(box.left - left, right - box.right, box.top - top, bottom - box.bottom));
+};
+
 /** Paints something at (x, y): a background, an image, an SVG shape or glyphs. */
 const paintsAt = (el: Element, x: number, y: number): boolean => {
   if (effectiveOpacity(el) < 0.05) return false;
@@ -246,7 +261,7 @@ export const measure = (frame: number, doc: Document = document): ProbeReport =>
       words: text.split(/\s+/).filter(Boolean).length, column: h.hasAttribute("data-rushit-column"),
       box: toBox(box), inFrame: inFrameShare(box, W, H), opacity: effectiveOpacity(el),
       fontPx: +fontPx.toFixed(1), bold: Number(cs.fontWeight) >= 700, overflow,
-      clippedBy: clipper ? selectorOf(clipper) : null, contrast, ...allowedOf(el),
+      clippedBy: clipper ? selectorOf(clipper) : null, margin: marginOf(el, box, W, H), contrast, ...allowedOf(el),
     };
   });
 

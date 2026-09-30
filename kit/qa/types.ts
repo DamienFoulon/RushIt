@@ -33,6 +33,8 @@ export type TextFact = {
   bold: boolean;
   overflow: boolean;
   clippedBy: string | null;
+  /** Shortest distance, in screen pixels, from the text to an edge of its nearest clipping ancestor or of the image. Negative past the edge. */
+  margin: number;
   contrast: number | null;
   allowed: string[];
   reasons: string[];

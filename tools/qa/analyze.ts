@@ -109,6 +109,7 @@ export const analyze = ({
       if (t.overflow || t.clippedBy) raws.push({ ...base, check: "coupe", cause: t.clippedBy ? `coupé par ${t.clippedBy}` : "déborde de son bloc" });
       if (t.inFrame < 0.9) raws.push({ ...base, check: "hors-cadre", cause: `${pct(1 - t.inFrame)} hors de l'image` });
       if (t.fontPx < rules.minTextPx) raws.push({ ...base, check: "petit-texte", cause: `${t.fontPx} px à l'écran (minimum ${rules.minTextPx})` });
+      if (!t.column && t.inFrame > 0 && t.margin < rules.minMarginPx) raws.push({ ...base, check: "marge", cause: `à ${t.margin} px du bord de sa fenêtre (minimum ${rules.minMarginPx})` });
       const min = t.fontPx >= 24 || (t.bold && t.fontPx >= 18.66) ? 3 : rules.minContrast;
       if (t.contrast !== null && t.contrast < min) raws.push({ ...base, check: "contraste", cause: `contraste ${t.contrast}:1 (minimum ${min})` });
       const col = layout.textColumn;

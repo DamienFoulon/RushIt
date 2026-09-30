@@ -9,6 +9,8 @@ describe("parseQaRules", () => {
     expect(DEFAULT_RULES.secondsPerWord).toBe(0.3);
     expect(DEFAULT_RULES.minTextPx).toBe(24);
     expect(DEFAULT_RULES.minContrast).toBe(4.5);
+    expect(DEFAULT_RULES.minMarginPx).toBe(32);
+    expect(DEFAULT_RULES.levels.marge).toBe("avertissement");
     expect(DEFAULT_RULES.levels.chevauchement).toBe("erreur");
     expect(DEFAULT_RULES.levels.lecture).toBe("avertissement");
   });
@@ -18,6 +20,11 @@ describe("parseQaRules", () => {
     expect(r.secondsPerWord).toBe(0.25);
     expect(r.minTextPx).toBe(22);
     expect(r.minContrast).toBe(3.5);
+  });
+
+  it("lit la marge minimale", () => {
+    expect(parseQaRules(section("- marge minimale : 48 px")).minMarginPx).toBe(48);
+    expect(parseQaRules(section("- sévérité : marge = erreur")).levels.marge).toBe("erreur");
   });
 
   it("lit les sévérités", () => {

@@ -29,6 +29,7 @@ describe("check sur la vidéo de défauts", () => {
     expect(has("contraste", "contraste")).toBe(true);
     expect(has("zone", "zone")).toBe(true);
     expect(has("lecture", "zone")).toBe(true);
+    expect(has("marge", "marge")).toBe(true);
     expect(r.findings.filter((f) => f.scene === "propre" && f.level !== "accepté")).toEqual([]);
     expect(existsSync(path.join(dir, "qa/report.json"))).toBe(true);
     expect(readFileSync(path.join(dir, "qa/report.html"), "utf8")).toMatch(/chevauchement/);

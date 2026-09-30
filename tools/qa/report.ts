@@ -4,7 +4,7 @@ import type { Finding } from "./analyze";
 
 const colors: Record<string, string> = {
   attente: "#ffd400", chevauchement: "#ff1744", coupe: "#76ff03", "hors-cadre": "#ff9100",
-  "petit-texte": "#00e5ff", contraste: "#ea80fc", lecture: "#64ffda", zone: "#b0bec5", acceptation: "#90a4ae",
+  "petit-texte": "#00e5ff", contraste: "#ea80fc", lecture: "#64ffda", zone: "#b0bec5", marge: "#ffab40", acceptation: "#90a4ae",
 };
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 

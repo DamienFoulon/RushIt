@@ -21,6 +21,7 @@ const ShouldHide = () => (<AbsoluteFill><Expect id="cache" hidden={[0, 29]}><div
 const NotMounted = () => (<AbsoluteFill><Expect id="absent" visible={[0, 29]}>{null}</Expect></AbsoluteFill>);
 const LowContrast = () => (<AbsoluteFill><p style={{ ...T, left: 500, top: 200, color: "#dddddd" }}>Contraste faible</p></AbsoluteFill>);
 const OutOfZone = () => (<AbsoluteFill><p style={{ ...T, left: 400, top: 680, fontSize: 24, whiteSpace: "nowrap" }}>Texte entre les zones</p></AbsoluteFill>);
+const Margin = () => (<AbsoluteFill><div style={box({ left: 500, top: 200, width: 400, height: 200, overflow: "hidden" })}><p style={{ ...T, right: 8, top: 80, whiteSpace: "nowrap" }}>Collé au bord</p></div></AbsoluteFill>);
 const Clean = () => (
   <AbsoluteFill>
     <Layer><p style={{ ...T, left: 500, top: 200 }}>Superposition voulue</p></Layer>
@@ -39,6 +40,7 @@ const scenes: [string, React.FC<SceneProps>, string[]][] = [
   ["chevauchement", Overlap, []], ["coupe", Cut, []], ["hors-cadre", OffFrame, []], ["rogne", Clipped, []],
   ["couvert", Covered, []], ["pale", Faded, []], ["petit", Tiny, []], ["cache", ShouldHide, []],
   ["absent", NotMounted, []], ["contraste", LowContrast, []], ["zone", OutOfZone, ["Une ligne de colonne longue à lire"]], ["propre", Clean, []],
+  ["marge", Margin, []],
 ];
 
 const definition: VideoDefinition = {
