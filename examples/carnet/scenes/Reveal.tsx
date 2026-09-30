@@ -1,6 +1,5 @@
 import { useCurrentFrame } from "remotion";
-import { at, Pointer, ProductWindow, progress, useEase, useLayout, WIDE, type SceneProps } from "rushit/kit";
-import { frameOn } from "../app/camera";
+import { at, frameOn, Pointer, ProductWindow, progress, useEase, useLayout, WIDE, type SceneProps } from "rushit/kit";
 import { app, listBox, NotesApp, notes, rowTop } from "../app/NotesApp";
 
 /** Where the pointer rests on the first note: in the gap between its title and its tag. */

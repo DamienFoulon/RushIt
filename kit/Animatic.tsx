@@ -34,7 +34,7 @@ export const Animatic: React.FC<{ video: VideoJson; definition: VideoDefinition 
                 >
                   {`Scène ${i + 1} · ${scene.title ?? scene.id}`}
                 </div>
-                <TextColumn texts={scene.texts} textsAt={t.textsAt} />
+                <TextColumn texts={scene.texts} textsAt={t.textsAt} duration={t.durationInFrames} />
               </AbsoluteFill>
             </Sequence>
           );

@@ -10,7 +10,7 @@ Le fichier `videos/<vidéo>/out/<vidéo>.mp4`, avec son affiche `poster.jpg` pla
    Le rendu lance d'abord la passe de contrôle complète. S'il reste une erreur, il refuse de rendre, résume les erreurs et donne le chemin de `qa/report.html`. Lire le rapport, corriger la scène en cause (voir `method/06-scenes.md`), relancer.
 2. Ouvrir `out/poster.jpg`. Par défaut c'est l'image une seconde avant la fin. Pour en choisir une autre, régler `posterSeconds` dans `video.json` et relancer.
 3. Regarder le MP4 en entier, avec le son.
-4. Vérifier le crédit musical : si la licence l'exige (`creditRequired`), il s'affiche pendant la dernière scène.
+4. Vérifier le crédit musical : si la licence l'exige (`creditRequired`), il s'affiche en bas de l'image un temps après le début de la dernière scène.
 
 ## Arrêt
 

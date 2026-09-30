@@ -10,6 +10,20 @@ export const fitScale = (l: Layout) => Math.min(l.stage.width / l.window.width, 
 /** The wide shot: centre of the window, zoom 1. */
 export const WIDE = (l: Layout) => ({ x: l.window.width / 2, y: l.window.height / 2, zoom: 1 });
 
+/** A rectangle in logical window pixels. */
+export type Box = { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number };
+
+/**
+ * The shot that shows `box` as large as it fits, centred, `margin` screen
+ * pixels from the nearest edges of the stage. Outside the window, the stage
+ * shows the window's own background, so a shot may look past its edges.
+ */
+export const frameOn = (box: Box, layout: Layout, margin = 56) => {
+  const { stage } = layout;
+  const scale = Math.min((stage.width - 2 * margin) / (box.right - box.left), (stage.height - 2 * margin) / (box.bottom - box.top));
+  return { x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2, zoom: scale / fitScale(layout) };
+};
+
 /**
  * The product window on the stage, seen through a camera. Children are laid
  * out in logical window pixels. The pointer goes inside too, so it moves with

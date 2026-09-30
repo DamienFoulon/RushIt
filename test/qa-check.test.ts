@@ -6,9 +6,9 @@ import { tempDirs } from "./helpers/tmp";
 
 const tmp = tempDirs("rushit-check-");
 
-const copy = (fixture: string) => {
+const copy = (fixture: string, from = "test/fixtures") => {
   const dir = path.join(tmp(), fixture);
-  cpSync(path.join("test/fixtures", fixture), dir, { recursive: true });
+  cpSync(path.join(from, fixture), dir, { recursive: true });
   return dir;
 };
 
@@ -45,5 +45,14 @@ describe("check sur la vidéo propre", () => {
   it("aucune erreur", async () => {
     const r = await runCheck(copy("video-min"));
     expect(r.errors).toBe(0);
+  }, 300_000);
+});
+
+describe("check sur Carnet", () => {
+  it("aucune erreur, et le crédit musical se lit dans la zone sûre", async () => {
+    const r = await runCheck(copy("carnet", "examples"));
+    expect(r.errors).toBe(0);
+    const credit = r.findings.filter((f) => f.element.text.startsWith('"Beauty Flow"'));
+    expect(credit.filter((f) => f.check === "petit-texte" || f.check === "marge")).toEqual([]);
   }, 300_000);
 });

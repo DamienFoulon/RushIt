@@ -1,6 +1,8 @@
 // Carnet, a fictional notes app, drawn for the example at the window's logical size (1440×900).
 // Every height is fixed, so that the scenes can frame the list from its exact box.
 
+import type { Box } from "rushit/kit";
+
 export type Note = { readonly title: string; readonly preview: string; readonly tag: string; readonly when: string };
 
 export const notes: readonly Note[] = [
@@ -28,8 +30,6 @@ const rowsTop = app.top + app.heading + app.headingGap;
 
 /** Top of note `i`, with the draft slot open by `open` (0 to 1). */
 export const rowTop = (i: number, open = 0) => rowsTop + open * (app.row + app.draftGap) + i * (app.row + app.rowGap);
-
-export type Box = { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number };
 
 /** The heading and every note, with room for the draft when `withDraft`. */
 export const listBox = (withDraft: boolean): Box => ({

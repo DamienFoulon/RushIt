@@ -1,6 +1,5 @@
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { at, Keys, Pointer, ProductWindow, progress, typed, useEase, useLayout, type SceneProps } from "rushit/kit";
-import { frameOn } from "../app/camera";
+import { at, frameOn, Keys, Pointer, ProductWindow, progress, typed, useEase, useLayout, type SceneProps } from "rushit/kit";
 import { listBox, NotesApp } from "../app/NotesApp";
 import { HOVER } from "./Reveal";
 

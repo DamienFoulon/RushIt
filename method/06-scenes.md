@@ -8,7 +8,7 @@ Des scènes finies, une par fichier dans `scenes/`, qui suivent le scénario et 
 
 1. Une scène à la fois, dans l'ordre. Chaque composant reçoit `duration`, `beat` (images par temps) et `textsAt`.
 2. Se servir de la grammaire du kit, importée de `rushit/kit` :
-   - `ProductWindow` et ses plans (`shots`), avec `WIDE(layout)` pour l'écran entier.
+   - `ProductWindow` et ses plans (`shots`), avec `WIDE(layout)` pour l'écran entier et `frameOn(boîte, layout)` pour cadrer une partie de la fenêtre, à 56 px des bords de la scène.
    - `Pointer` pour guider le regard, `Keys` pour ce qui se fait au clavier.
    - `typed` pour un texte qui se tape, `at(beat, n)` pour placer un geste sur le n-ième temps, `progress` pour une transition.
    - `useEase` pour la courbe de la vidéo, `useLayout` pour la mise en page du thème.

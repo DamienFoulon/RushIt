@@ -10,10 +10,12 @@ const tmp = tempDirs("rushit-qa-");
 let session: Session;
 let reports: Map<number, ProbeReport>;
 const at = (sceneIndex: number) => sceneIndex * 30 + 15;
+/** Last frame of the "zone" scene (frames 300 to 329), the one with a text column. */
+const LAST_OF_ZONE = 329;
 
 beforeAll(async () => {
   session = await openSession(path.resolve("test/fixtures/qa-defects"));
-  const frames = Array.from({ length: 13 }, (_, i) => at(i));
+  const frames = [...Array.from({ length: 13 }, (_, i) => at(i)), LAST_OF_ZONE];
   const out = tmp();
   reports = new Map((await session.render(frames, out)).map((r) => [r.frame, r]));
 }, 300_000);
@@ -22,7 +24,11 @@ afterAll(() => session?.close());
 const expectFact = (i: number, id: string) => reports.get(at(i))!.expects.find((e) => e.id === id)!;
 
 describe("mesure dans la page", () => {
-  it("rapporte chaque image demandée", () => expect(reports.size).toBe(13));
+  it("rapporte chaque image demandée", () => expect(reports.size).toBe(14));
+  it("la ligne de colonne est pleine au milieu de sa scène et sortie à sa dernière image", () => {
+    expect(reports.get(at(10))!.texts.find((t) => t.column)!.opacity).toBe(1);
+    expect(reports.get(LAST_OF_ZONE)!.texts.some((t) => t.column)).toBe(false);
+  });
   it("voit le chevauchement", () => expect(reports.get(at(0))!.overlaps.length).toBeGreaterThan(0));
   it("voit le chevauchement de deux cartes tournées différentes", () => {
     const o = reports.get(at(0))!.overlaps;
