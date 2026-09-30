@@ -13,6 +13,7 @@ RushIt fabrique des vidéos de présentation de produit avec Remotion. Une vidé
 - Données de démo seulement. Ne jamais lire `.env`, clés ou secrets, ni afficher une vraie adresse e-mail ou un vrai nom.
 - Tout ce qui bouge dépend de `useCurrentFrame()`, jamais d'une horloge ni de `Math.random()`.
 - Ne jamais imposer le look d'une autre vidéo : couleurs, polices et mise en page viennent du produit présenté.
+- Après chaque scène, lancer `check --scene`. Ne jamais passer `--force` sans l'accord de l'humain.
 
 ## Commandes
 
@@ -24,7 +25,8 @@ RushIt fabrique des vidéos de présentation de produit avec Remotion. Une vidé
 | `npm run music -- shift <vidéo> --beats <N>` | décale les premiers temps de N temps si le témoin de mesure tombe à côté |
 | `npm run music -- catalog` | liste les morceaux de référence |
 | `npm run studio -- <vidéo>` | ouvre Remotion Studio (compositions `Animatic` et `Film`) |
-| `npm run render -- <vidéo> [--scale 0.333]` | rend `videos/<vidéo>/out/<vidéo>.mp4` et son affiche |
+| `npm run check -- <vidéo> [--scene <id>] [--every <s>] [--accept <id> --reason "…"] [--open]` | passe de contrôle : signale textes superposés, coupés, trop petits, trop brefs, attentes non tenues, écrit `qa/report.html` |
+| `npm run render -- <vidéo> [--scale 0.333] [--force]` | lance la passe complète, puis rend `videos/<vidéo>/out/<vidéo>.mp4` et son affiche s'il ne reste aucune erreur |
 | `npm run export -- <vidéo>` | produit `<vidéo>.rushit.zip` |
 | `npm run import -- <fichier> [--as <nom>]` | importe une vidéo reçue |
 

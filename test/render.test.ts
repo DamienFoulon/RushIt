@@ -19,24 +19,24 @@ const frameCount = (file: string): number => {
 };
 
 describe("renderVideo", () => {
-  it("rend la vidéo minimale et son affiche", () => {
+  it("rend la vidéo minimale et son affiche", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "rushit-render-"));
     cpSync("test/fixtures/video-min", dir, { recursive: true });
-    const r = renderVideo(dir);
+    const r = await renderVideo(dir);
     expect(statSync(r.mp4).size).toBeGreaterThan(1000);
     expect(existsSync(r.poster)).toBe(true);
     // The poster replaces frame 0, it does not add or remove one: 4 s at 30 fps.
     expect(frameCount(r.mp4)).toBe(120);
   }, 300_000);
 
-  it("refuse de rendre quand une police déclarée manque, en la nommant", () => {
+  it("refuse de rendre quand une police déclarée manque, en la nommant", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "rushit-render-"));
     cpSync("test/fixtures/video-min", dir, { recursive: true });
     const json = path.join(dir, "video.json");
     const v = JSON.parse(readFileSync(json, "utf8"));
     v.theme.fonts = [{ family: "X", file: "assets/fonts/x.woff2", weight: "400" }];
     writeFileSync(json, JSON.stringify(v));
-    expect(() => renderVideo(dir)).toThrow(/assets\/fonts\/x\.woff2/);
+    await expect(renderVideo(dir)).rejects.toThrow(/assets\/fonts\/x\.woff2/);
   });
 
   it("arrête le rendu quand une police déclarée est illisible, en la nommant, sans repli silencieux", () => {

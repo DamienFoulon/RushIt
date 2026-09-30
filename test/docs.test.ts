@@ -19,6 +19,11 @@ describe("documents", () => {
     expect(a).toMatch(/rythme/);
   });
 
+  it("AGENTS.md donne la passe de contrôle, et la fiche des scènes présente Expect", () => {
+    expect(readFileSync("AGENTS.md", "utf8")).toMatch(/npm run check/);
+    expect(readFileSync("method/06-scenes.md", "utf8")).toMatch(/Expect/);
+  });
+
   it("aucun tiret cadratin ni point-virgule entre propositions dans les textes", () => {
     expect(texts.filter((d) => d.startsWith("method/"))).toHaveLength(8);
     for (const d of texts) {

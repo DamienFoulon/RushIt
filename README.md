@@ -11,7 +11,8 @@ Chaque vidéo est un dossier autonome, `videos/<nom>/`. Il contient tout ce qu'i
 Le dépôt fournit :
 
 - un **kit** de mise en scène : colonne de texte, fenêtre du produit avec caméra, pointeur, touches du clavier, calage des scènes sur la musique
-- des **commandes** pour créer une vidéo, analyser et monter un morceau, prévisualiser, rendre, exporter et importer
+- des **commandes** pour créer une vidéo, analyser et monter un morceau, prévisualiser, contrôler, rendre, exporter et importer
+- une **passe de contrôle** qui regarde la vidéo image par image avant le rendu et signale textes superposés, coupés, trop petits ou trop brefs, avec un rapport annoté
 - une **méthode** écrite, étape par étape, dans `method/`, lisible par un humain comme par un agent de code
 - un **exemple** complet, « Carnet », une application de notes fictive.
 
@@ -64,8 +65,8 @@ Le premier `new` télécharge le morceau de l'exemple. Le rendu arrive dans `vid
 | 3. Musique | `npm run music -- add <nom> <fichier\|lien\|slug>` | `method/03-musique.md` |
 | 4. Thème | remplir `theme` dans `video.json` | `method/04-theme.md` |
 | 5. Animatique | `npm run studio -- <nom>`, composition `Animatic` | `method/05-animatique.md` |
-| 6. Scènes | un fichier par scène dans `scenes/`, composition `Film` | `method/06-scenes.md` |
-| 7. Rendu | `npm run render -- <nom>` | `method/07-rendu.md` |
+| 6. Scènes | un fichier par scène dans `scenes/`, composition `Film`, puis `npm run check -- <nom> --scene <id>` | `method/06-scenes.md` |
+| 7. Rendu | `npm run render -- <nom>`, qui refuse de rendre tant que la passe de contrôle trouve une erreur | `method/07-rendu.md` |
 | 8. Partager | `npm run export -- <nom>`, `npm run import -- <fichier>` | `method/08-partager.md` |
 
 Trois étapes se valident par un humain, à l'œil et à l'oreille, avant d'aller plus loin : le scénario, le choix de la musique, le rythme de l'animatique.
@@ -88,9 +89,8 @@ D'une machine à l'autre, l'identité est mesurée par l'intégration continue. 
 
 ## Ce qui arrive
 
-RushIt se construit par lots. Celui-ci est le socle. Viennent ensuite :
+RushIt se construit par lots. Le socle et la passe de contrôle sont là. Viennent ensuite :
 
-- une passe de contrôle automatique, qui repère textes superposés, coupés, trop petits ou trop brefs avant le rendu
 - l'affichage du vrai produit, compilé ou capturé depuis son code, isolé dans la vidéo
 - des bruitages choisis par intention, et des sons de mouvement fabriqués sur mesure
 - la recherche de musique libre de droits
