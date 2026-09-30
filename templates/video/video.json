@@ -1,0 +1,15 @@
+{
+  "rushit": "0.1.0",
+  "durationSeconds": 20,
+  "format": { "width": 1920, "height": 1080, "fps": 30 },
+  "theme": {
+    "colors": { "bg": "#f5f5f4", "ink": "#1c1917", "accent": "#57534e", "surface": "#ffffff", "line": "#d6d3d1" },
+    "fonts": [],
+    "layout": {
+      "textColumn": { "left": 96, "width": 600 },
+      "stage": { "left": 760, "top": 198, "width": 1096, "height": 685 },
+      "window": { "width": 1440, "height": 900 }
+    }
+  },
+  "sfx": []
+}
