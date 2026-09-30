@@ -1,11 +1,11 @@
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { strToU8, unzipSync, zipSync } from "fflate";
+import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import { exportVideo } from "../tools/export";
 import { importVideo } from "../tools/import";
-import { buildManifest, verifyManifest, versionAdvice } from "../tools/share/manifest";
+import { buildManifest, type Manifest, verifyManifest, versionAdvice } from "../tools/share/manifest";
 
 const tmp = () => mkdtempSync(path.join(tmpdir(), "rushit-share-"));
 const withVideo = () => {
@@ -48,5 +48,54 @@ describe("export puis import", () => {
     entries["demo/video.json"] = strToU8("{}");
     writeFileSync(zip, zipSync(entries));
     expect(() => importVideo(zip, { root: tmp() })).toThrow(/video\.json/);
+  });
+});
+
+describe("import, noms et chemins qui sortent du dossier", () => {
+  /** Rebuilds a zip under `name` with `extra` files, with a manifest whose hashes match. */
+  const forge = (name: string, extra: Record<string, Uint8Array> = {}) => {
+    const zip = path.join(tmp(), "demo.rushit.zip");
+    exportVideo(withVideo(), zip);
+    const entries = unzipSync(readFileSync(zip));
+    const old = JSON.parse(strFromU8(entries["manifest.json"])) as Manifest;
+    const files: Record<string, Uint8Array> = { ...extra };
+    for (const [p, b] of Object.entries(entries)) if (p.startsWith("demo/")) files[p.slice("demo/".length)] = b;
+    const manifest = buildManifest(files, name, old.rushit, old.lock);
+    const out: Record<string, Uint8Array> = { "manifest.json": strToU8(JSON.stringify(manifest)) };
+    for (const [p, b] of Object.entries(files)) out[`${name}/${p}`] = b;
+    writeFileSync(zip, zipSync(out));
+    return zip;
+  };
+  /** A root nested in a fresh folder, so an escape would land in `base`. */
+  const nestedRoot = () => {
+    const base = tmp();
+    const root = path.join(base, "videos");
+    mkdirSync(root);
+    return { base, root };
+  };
+
+  it("refuse un manifeste dont le nom sort du dossier", () => {
+    const { base, root } = nestedRoot();
+    expect(() => importVideo(forge("../evasion"), { root })).toThrow(/\.\.\/evasion/);
+    expect(existsSync(path.join(base, "evasion"))).toBe(false);
+    expect(readdirSync(root)).toEqual([]);
+  });
+
+  it("refuse un chemin de fichier qui remonte, sans rien écrire", () => {
+    const { base, root } = nestedRoot();
+    const zip = forge("demo", { "../../evasion.txt": strToU8("dehors") });
+    expect(Object.keys(unzipSync(readFileSync(zip)))).toContain("demo/../../evasion.txt");
+    expect(() => importVideo(zip, { root })).toThrow(/evasion\.txt/);
+    expect(existsSync(path.join(base, "evasion.txt"))).toBe(false);
+    expect(readdirSync(root)).toEqual([]);
+  });
+
+  it("refuse --as qui sort du dossier", () => {
+    const { base, root } = nestedRoot();
+    const zip = path.join(tmp(), "demo.rushit.zip");
+    exportVideo(withVideo(), zip);
+    expect(() => importVideo(zip, { root, as: "../x" })).toThrow(/\.\.\/x/);
+    expect(existsSync(path.join(base, "x"))).toBe(false);
+    expect(readdirSync(root)).toEqual([]);
   });
 });
