@@ -39,6 +39,27 @@ describe("parseQaRules", () => {
     expect(r.problems[0]).toMatch(/attente/);
   });
 
+  it("donne à chaque contrôle le niveau par défaut de la spécification", () => {
+    expect(DEFAULT_RULES.levels).toEqual({
+      attente: "erreur", chevauchement: "erreur", coupe: "erreur", "hors-cadre": "erreur",
+      "petit-texte": "avertissement", contraste: "avertissement", lecture: "avertissement", zone: "avertissement",
+      marge: "avertissement",
+    });
+  });
+
+  it("signale une ligne de clé inconnue, sans rien changer", () => {
+    const r = parseQaRules(section("- couleur du texte : rouge"));
+    expect(r.problems).toEqual(["couleur du texte : rouge"]);
+    expect({ ...r, problems: [] }).toEqual(DEFAULT_RULES);
+  });
+
+  it("signale une sévérité mal écrite et garde le niveau par défaut, le reste de la ligne s'applique", () => {
+    const r = parseQaRules(section("- sévérité : lecture = fort, bavure = erreur, zone = ignoré"));
+    expect(r.problems).toEqual(["sévérité : lecture = fort", "sévérité : bavure = erreur"]);
+    expect(r.levels.lecture).toBe("avertissement");
+    expect(r.levels.zone).toBe("ignoré");
+  });
+
   it("garde la valeur neutre pour une ligne illisible et la signale", () => {
     const r = parseQaRules(section("- lecture : vite"));
     expect(r.secondsPerWord).toBe(0.3);
