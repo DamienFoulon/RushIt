@@ -1,0 +1,38 @@
+{
+  "rushit": "0.1.0",
+  "durationSeconds": 20,
+  "format": { "width": 1920, "height": 1080, "fps": 30 },
+  "theme": {
+    "colors": {
+      "bg": "#f7f3ec",
+      "surface": "#fffdf8",
+      "ink": "#2b2621",
+      "title": "#2b2621",
+      "accent": "#c2571a",
+      "muted": "#7a6f64",
+      "line": "#e4dccf",
+      "pointer": "#2b2621"
+    },
+    "fonts": [{ "family": "Inter", "file": "assets/fonts/inter.woff2", "weight": "100 900" }],
+    "layout": {
+      "textColumn": { "left": 96, "width": 600 },
+      "stage": { "left": 760, "top": 198, "width": 1096, "height": 685 },
+      "window": { "width": 1440, "height": 900 }
+    }
+  },
+  "music": {
+    "file": "audio/beauty-flow.mp3",
+    "title": "Beauty Flow",
+    "artist": "Kevin MacLeod",
+    "licence": "CC BY 4.0",
+    "credit": "\"Beauty Flow\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 License http://creativecommons.org/licenses/by/4.0/",
+    "creditRequired": true,
+    "pageUrl": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900008",
+    "bpm": 107.93,
+    "segments": [[0,7.801904678344727],[422.2548522949219,433.3975510204082]],
+    "downbeats": [1.138,3.355,5.573,7.802,10.031,12.283,14.512,17.02],
+    "beats": [0.569,1.138,1.695,2.252,2.798,3.355,3.913,4.47,5.016,5.573,6.13,6.687,7.245,7.802,8.359,8.916,9.474,10.031,10.588,11.146,11.714,12.283,12.841,13.398,13.955,14.512,15.139,15.766,16.393,17.02,17.647,18.274],
+    "outputDuration": 18.945
+  },
+  "sfx": []
+}
