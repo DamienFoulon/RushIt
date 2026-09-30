@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import grids from "./fixtures/kontrol-grids.json";
+import grids from "./fixtures/reference-grids.json";
 import { analyzeGrid } from "../tools/music/analyze";
 import { decodeMono } from "../tools/music/decode";
 
