@@ -32,6 +32,7 @@
     "@remotion/eslint-config-flat": "4.0.530",
     "@types/node": "26.0.0",
     "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "eslint": "9.19.0",
     "prettier": "3.8.1",
     "typescript": "5.9.3",
