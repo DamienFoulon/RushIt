@@ -91,8 +91,47 @@ describe("proposeEdit", () => {
   });
 });
 
+describe("proposeEdit, seuils mesurés sur la grille", () => {
+  // Bars of 4 s: half a bar is 2 s, not the 1 s a default bar of 2 s would give.
+  const downbeats = Array.from({ length: 30 }, (_, i) => i * 4);
+  const flat = () => 0;
+
+  it("prévient quand le morceau est plus court que la cible de plus d'une demi-mesure", () => {
+    const r = proposeEdit({ downbeats, duration: 27.9, target: 30, distance: flat });
+    expect(r.segments).toEqual([[0, 27.9]]);
+    expect(r.warning).toMatch(/plus court/);
+  });
+
+  it("garde le morceau entier sans prévenir quand il manque moins d'une demi-mesure", () => {
+    expect(proposeEdit({ downbeats, duration: 28.1, target: 30, distance: flat })).toEqual({ segments: [[0, 28.1]] });
+    expect(proposeEdit({ downbeats, duration: 28, target: 30, distance: flat }).warning).toBeUndefined();
+  });
+
+  it("garde le morceau entier sans prévenir quand il tient la cible à une demi-mesure près", () => {
+    for (const duration of [30, 31.9, 32]) {
+      const r = proposeEdit({ downbeats, duration, target: 30, distance: flat });
+      expect(r.segments).toEqual([[0, duration]]);
+      expect(r.warning).toBeUndefined();
+    }
+  });
+});
+
+describe("proposeEdit, intro d'au moins un tiers de la cible", () => {
+  const downbeats = Array.from({ length: 60 }, (_, i) => i * 2);
+
+  it("écarte un raccord avant le tiers de la cible, même s'il est le plus ressemblant", () => {
+    // Target 30: the intro must last 10 s. A join at 4 s would sound best, one at 10 s comes next.
+    const distance = (a: number, b: number) => (a === 4 && b === 74 ? 0 : a === 10 && b === 80 ? 0.5 : 1);
+    expect(proposeEdit({ downbeats, duration: 100, target: 30, distance })).toEqual({ segments: [[0, 10], [80, 100]] });
+  });
+});
+
 describe("toOutputDownbeats", () => {
   it("recalcule la grille après le montage", () => {
     expect(toOutputDownbeats([0, 2, 4, 96, 98, 100], [[0, 4], [96, 100]])).toEqual([0, 2, 4, 6]);
+  });
+
+  it("compte depuis le début du premier segment quand il ne commence pas à zéro", () => {
+    expect(toOutputDownbeats([0, 2, 4, 6, 8, 50, 52, 54], [[2, 6], [50, 54]])).toEqual([0, 2, 4, 6]);
   });
 });
