@@ -84,7 +84,7 @@ Garanti : sur une même machine, avec la même version de RushIt installée par 
 
 Pour y arriver, RushIt rend avec le navigateur que Remotion télécharge et son moteur graphique logiciel `swiftshader`, charge les polices depuis le dossier de la vidéo, et assemble le montage musical une fois pour toutes dans un fichier WAV que le film joue d'un bout à l'autre.
 
-D'une machine à l'autre, l'identité est mesurée, pas encore garantie. L'intégration continue rend « Carnet » en 640×360, écrit les empreintes de chaque image et du son (`npm run hashes -- <vidéo>`) et les compare à celles de la machine de référence (`test/fixtures/carnet-hashes-640.json`).
+D'une machine à l'autre, l'identité est mesurée par l'intégration continue. Elle rend « Carnet » en 640×360, écrit les empreintes de chaque image et du son (`npm run hashes -- <vidéo>`) et les compare à celles de la machine de référence (`test/fixtures/carnet-hashes-640.json`). Premier résultat, le 30 septembre 2026 : entre un poste Linux x86-64 et un serveur GitHub Actions Linux x86-64, 0 image différente sur 568 et un son identique. Les autres systèmes (macOS, Windows, processeurs ARM) n'ont pas encore été mesurés.
 
 ## Ce qui arrive
 
