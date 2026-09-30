@@ -19,9 +19,13 @@ export const themeToCss = (theme: Theme): Record<string, string> => ({
 export const ThemeProvider: React.FC<{ theme: Theme; children: ReactNode }> = ({ theme, children }) => {
   const [handle] = useState(() => delayRender("Chargement des polices du thème"));
   useEffect(() => {
-    Promise.all(theme.fonts.map((f) => loadFont({ family: f.family, url: staticFile(f.file), weight: f.weight })))
+    const load = (f: Theme["fonts"][number]) =>
+      loadFont({ family: f.family, url: staticFile(f.file), weight: f.weight }).catch((err: Error) => {
+        throw new Error(`Police ${f.family} (${f.file}) introuvable ou illisible : ${err.message}`);
+      });
+    Promise.all(theme.fonts.map(load))
       .then(() => continueRender(handle))
-      .catch((err: Error) => cancelRender(new Error(`Police introuvable ou illisible : ${err.message}`)));
+      .catch((err: Error) => cancelRender(err));
   }, [handle, theme.fonts]);
   const ease = Easing.bezier(...theme.ease);
   return (
