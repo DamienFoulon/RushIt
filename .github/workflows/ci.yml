@@ -1,0 +1,44 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx remotion browser ensure
+      - run: npx tsc
+      - run: npx eslint kit tools src test
+      # Two renders of Carnet on this machine: identical pictures and sound, required.
+      - run: npx vitest run --exclude test/reference.test.ts
+        env:
+          RUSHIT_E2E: "1"
+
+  # A measure, not a requirement: is Carnet rendered here identical to Carnet
+  # rendered on the reference machine (test/fixtures/carnet-hashes-640.json)?
+  reference:
+    name: comparaison avec la machine de référence
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx remotion browser ensure
+      - run: npm run new -- carnet --from carnet --rules neutre
+      - run: npm run render -- carnet --scale 0.3333333333333333
+      - run: npm run hashes -- carnet
+      - uses: actions/upload-artifact@v4
+        with:
+          name: carnet-hashes-640
+          path: videos/carnet/out/hashes.json
+      - run: npx vitest run test/reference.test.ts
+        env:
+          RUSHIT_E2E: "1"
