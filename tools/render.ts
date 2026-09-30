@@ -10,9 +10,16 @@ import { checkAssets, readVideo } from "./lib/video";
 /**
  * The check pass runs first and refuses the render while an error remains.
  * `force` renders anyway and says so in the report. `skipCheck` is for the
- * reproducibility tests only, which do not test the pass.
+ * reproducibility tests only, which do not test the pass. `quality: "max"`
+ * renders at twice the size, then scales down to the size of video.json with
+ * lanczos, for sharp text and edges.
  */
-export const renderVideo = async (dir: string, opts: { scale?: number; force?: boolean; skipCheck?: boolean } = {}) => {
+export const renderVideo = async (
+  dir: string,
+  opts: { scale?: number; force?: boolean; skipCheck?: boolean; quality?: "normal" | "max" } = {},
+) => {
+  const max = opts.quality === "max";
+  if (max && opts.scale !== undefined) throw new Error("--scale et --quality max sont exclusifs : choisir l'un ou l'autre.");
   const video = readVideo(dir);
   const missing = checkAssets(dir, video);
   if (missing.length) throw new Error(`Fichiers déclarés mais absents dans ${dir} :\n${missing.join("\n")}`);
@@ -34,7 +41,14 @@ export const renderVideo = async (dir: string, opts: { scale?: number; force?: b
   const raw = path.join(dir, "out", `${name}.raw.mp4`);
   const mp4 = path.join(dir, "out", `${name}.mp4`);
   const poster = path.join(dir, "out", "poster.jpg");
-  runRemotion(["render", "Film", raw, ...(opts.scale ? ["--scale", String(opts.scale)] : [])], dir);
+  if (max) {
+    const raw4k = path.join(dir, "out", `${name}.raw4k.mp4`);
+    runRemotion(["render", "Film", raw4k, "--scale", "2"], dir);
+    remotionFfmpeg([
+      "-y", "-v", "error", "-i", raw4k, "-vf", `scale=${video.format.width}:${video.format.height}:flags=lanczos`,
+      "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p", "-c:a", "copy", raw,
+    ]);
+  } else runRemotion(["render", "Film", raw, ...(opts.scale ? ["--scale", String(opts.scale)] : [])], dir);
   const at = video.posterSeconds ?? Math.max(0, filmSeconds(video) - 1);
   remotionFfmpeg(["-y", "-v", "error", "-ss", String(at), "-i", raw, "-frames:v", "1", "-q:v", "2", poster]);
   // The poster becomes frame 0, so every platform's thumbnail shows it. Same frame count, audio copied.
@@ -52,10 +66,14 @@ export const renderVideo = async (dir: string, opts: { scale?: number; force?: b
 const main = async () => {
   const { positional, flags } = parseArgs(process.argv.slice(2));
   const json = flags.json === true;
-  const name = positional[0] ?? fail("Usage : npm run render -- <vidéo> [--scale 0.333] [--force]", json);
+  const name = positional[0] ?? fail("Usage : npm run render -- <vidéo> [--scale 0.333 | --quality max] [--force]", json);
+  const quality = flags.quality;
+  if (quality !== undefined && quality !== "max" && quality !== "normal")
+    fail(`--quality attend max ou normal, pas « ${String(quality)} ».`, json);
   const r = await renderVideo(videoDir(name), {
     scale: typeof flags.scale === "string" ? Number(flags.scale) : undefined,
     force: flags.force === true,
+    quality: quality === "max" ? "max" : undefined,
   });
   output(json, `Rendu : ${r.mp4}\nAffiche : ${r.poster}`, { ok: true, ...r });
 };

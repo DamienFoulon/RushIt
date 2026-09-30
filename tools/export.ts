@@ -11,7 +11,7 @@ const collect = (dir: string, rel = ""): Record<string, Uint8Array> => {
   const out: Record<string, Uint8Array> = {};
   for (const entry of readdirSync(path.join(dir, rel))) {
     const r = path.posix.join(rel, entry);
-    if (r.endsWith(".raw.mp4")) continue;
+    if (r.endsWith(".raw.mp4") || r.endsWith(".raw4k.mp4")) continue;
     const full = path.join(dir, r);
     if (statSync(full).isDirectory()) Object.assign(out, collect(dir, r));
     else out[r] = new Uint8Array(readFileSync(full));
