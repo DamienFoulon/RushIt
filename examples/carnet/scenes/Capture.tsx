@@ -1,7 +1,7 @@
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { at, frameOn, Keys, Pointer, ProductWindow, progress, typed, useEase, useLayout, type SceneProps } from "rushit/kit";
 import { listBox, NotesApp } from "../app/NotesApp";
-import { HOVER } from "./Reveal";
+import { HOVER, OFFSHOT } from "./Reveal";
 
 const DRAFT = "Rappeler le fournisseur avant midi #achats";
 const PER_CHAR = 1.2;
@@ -43,7 +43,7 @@ export const Capture: React.FC<SceneProps> = ({ beat, duration }) => {
               draft={frame >= ctrlN + 5 ? { text: typed(DRAFT, frame, typeFrom, PER_CHAR), open, saved } : undefined}
             />
           </div>
-          <Pointer path={[{ at: 2, ...HOVER }, { at: ctrlN - 2, x: 1320, y: 820 }]} to={ctrlN - 2} />
+          <Pointer path={[{ at: 2, ...HOVER }, { at: ctrlN - 2, ...OFFSHOT }]} to={ctrlN - 2} />
         </ProductWindow>
       </AbsoluteFill>
       <Keys presses={[{ at: ctrlN, keys: ["Ctrl", "N"] }, { at: enter, keys: ["Entrée"], hold: 20 }]} />

@@ -2,8 +2,11 @@ import { useCurrentFrame } from "remotion";
 import { at, frameOn, Pointer, ProductWindow, progress, useEase, useLayout, WIDE, type SceneProps } from "rushit/kit";
 import { app, listBox, NotesApp, notes, rowTop } from "../app/NotesApp";
 
-/** Where the pointer rests on the first note: in the gap between its title and its tag. */
-export const HOVER = { x: 960, y: rowTop(0) + app.row / 2 };
+/** Where the pointer rests on the first note: past the end of its preview, under its tag. */
+export const HOVER = { x: 980, y: rowTop(0) + app.row / 2 + 14 };
+
+/** Out of the close shot, bottom right: where the pointer comes from and goes back to. */
+export const OFFSHOT = { x: 1060, y: 660 };
 
 /**
  * The window left by the pile fills in (sidebar, heading, then one note per
@@ -25,7 +28,7 @@ export const Reveal: React.FC<SceneProps> = ({ beat }) => {
   return (
     <ProductWindow shots={[{ at: zoomAt, ...WIDE(layout) }, { at: zoomed, ...close }]}>
       <NotesApp rows={rows} sidebar={sidebar} heading={progress(frame, 5, 17, ease)} hover={progress(frame, arrive - 4, arrive + 8, ease)} />
-      <Pointer path={[{ at: zoomed + 2, x: 1320, y: 820 }, { at: arrive, ...HOVER }]} from={zoomed + 2} />
+      <Pointer path={[{ at: zoomed + 2, ...OFFSHOT }, { at: arrive, ...HOVER }]} from={zoomed + 2} />
     </ProductWindow>
   );
 };

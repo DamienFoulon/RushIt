@@ -49,10 +49,13 @@ describe("check sur la vidéo propre", () => {
 });
 
 describe("check sur Carnet", () => {
-  it("aucune erreur, et le crédit musical se lit dans la zone sûre", async () => {
+  it("aucune erreur, un texte lisible partout, et le crédit musical dans la zone sûre", async () => {
     const r = await runCheck(copy("carnet", "examples"));
     expect(r.errors).toBe(0);
     const credit = r.findings.filter((f) => f.element.text.startsWith('"Beauty Flow"'));
     expect(credit.filter((f) => f.check === "petit-texte" || f.check === "marge")).toEqual([]);
+    // Every text of the app reads on screen, away from the edge of its window.
+    const unreadable = r.findings.filter((f) => f.check === "petit-texte" || f.check === "marge");
+    expect(unreadable.map((f) => `${f.scene} ${f.check} ${f.element.text} : ${f.cause}`)).toEqual([]);
   }, 300_000);
 });

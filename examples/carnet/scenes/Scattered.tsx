@@ -2,15 +2,15 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { at, progress, useEase, useLayout, type SceneProps } from "rushit/kit";
 import { notes } from "../app/NotesApp";
 
-const W = 480;
-const H = 116;
+const W = 500;
+const H = 146;
 
 // Where each paper lands, relative to the stage: apart, so that every title reads on its own.
 const spots = [
   { x: 30, y: 80, r: -4, label: "Post-it" },
   { x: 586, y: 60, r: 3, label: "E-mail" },
   { x: 80, y: 430, r: 3, label: "Message" },
-  { x: 560, y: 480, r: -3, label: "Cahier" },
+  { x: 590, y: 480, r: -3, label: "Cahier" },
 ];
 // In the pile, each paper sits a few pixels off the one above it: only the last one reads.
 const pile = [
@@ -39,6 +39,7 @@ export const Scattered: React.FC<SceneProps> = ({ beat, duration }) => {
   return (
     <AbsoluteFill>
       {spots.map((s, i) => {
+        // A paper settles from a little larger than its size: its words never show smaller than they are.
         const land = progress(frame, at(beat, i), at(beat, i) + 12, ease);
         const gather = progress(frame, gatherFrom + 3 * i, gatherFrom + 3 * i + 14, ease);
         const top = i === spots.length - 1;
@@ -55,14 +56,14 @@ export const Scattered: React.FC<SceneProps> = ({ beat, duration }) => {
               position: "absolute", boxSizing: "border-box", overflow: "hidden",
               left: stage.left + x, top: stage.top + y + (1 - land) * 28,
               width: lerp(W, stage.width, g), height: lerp(H, stage.height, g),
-              padding: "24px 28px", borderRadius: lerp(12, 18, g), background: "var(--surface)",
+              padding: "36px 40px", borderRadius: lerp(12, 18, g), background: "var(--surface)",
               border: `1px solid color-mix(in srgb, var(--line) ${Math.round((1 - g) * 100)}%, transparent)`,
               boxShadow: `0 ${lerp(10, 8, g)}px ${lerp(28, 24, g)}px rgba(0,0,0,0.14)`,
-              rotate: `${lerp(s.r, pile[i].r, gather)}deg`, scale: interpolate(land, [0, 1], [0.94, 1]), opacity: land,
+              rotate: `${lerp(s.r, pile[i].r, gather)}deg`, scale: interpolate(land, [0, 1], [1.04, 1]), opacity: land,
             }}
           >
             <div style={{ opacity: top ? 1 - empty : 1 - covered, whiteSpace: "nowrap" }}>
-              <div style={{ fontSize: 16, lineHeight: "20px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted)" }}>
+              <div style={{ fontSize: 24, lineHeight: "30px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted)" }}>
                 {s.label}
               </div>
               <div style={{ fontSize: 26, lineHeight: "36px", fontWeight: 600, marginTop: 8 }}>{notes[i].title}</div>
