@@ -124,12 +124,13 @@ const luminance = ([r, g, b]: number[]) => {
   return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
 };
 
-/** Colour composited behind (x, y) under `el`, or null when an image or gradient is involved. */
+/** Colour composited at (x, y) from `el` down to the page, or null when an image or gradient is involved. */
 const backgroundBehind = (el: Element, x: number, y: number): number[] | null => {
   const stack = document.elementsFromPoint(x, y);
   const layers: [number[], number][] = [];
   let left = 1;
-  for (const e of stack.slice(stack.indexOf(el) + 1)) {
+  // From the element itself: a text on its own background is read against it.
+  for (const e of stack.slice(Math.max(0, stack.indexOf(el)))) {
     const cs = getComputedStyle(e);
     if (cs.backgroundImage !== "none" || ["IMG", "VIDEO", "CANVAS", "IFRAME"].includes(e.tagName)) return null;
     const c = parseColor(cs.backgroundColor);
