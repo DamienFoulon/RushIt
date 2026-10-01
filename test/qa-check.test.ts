@@ -1,4 +1,4 @@
-import { cpSync, existsSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runCheck } from "../tools/check";
@@ -35,9 +35,14 @@ describe("check sur la vidéo de défauts", () => {
     expect(readFileSync(path.join(dir, "qa/report.html"), "utf8")).toMatch(/chevauchement/);
   }, 300_000);
 
-  it("--scene ne contrôle qu'une scène", async () => {
-    const r = await runCheck(copy("qa-defects"), { scene: "coupe" });
+  it("--scene ne contrôle qu'une scène, et seules ses acceptations peuvent être orphelines", async () => {
+    const dir = copy("qa-defects");
+    const accepted = (id: string, scene: string) => ({ id, check: "petit-texte", scene, element: "p|Nulle part", reason: "voulu", date: "2026-09-30" });
+    mkdirSync(path.join(dir, "qa"), { recursive: true });
+    writeFileSync(path.join(dir, "qa/accepted.json"), JSON.stringify([accepted("aaaaaaaa", "petit"), accepted("bbbbbbbb", "coupe")]));
+    const r = await runCheck(dir, { scene: "coupe" });
     expect(new Set(r.findings.map((f) => f.scene))).toEqual(new Set(["coupe"]));
+    expect(r.findings.filter((f) => f.check === "acceptation").map((f) => f.id)).toEqual(["bbbbbbbb"]);
   }, 300_000);
 });
 

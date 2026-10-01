@@ -42,7 +42,8 @@ export const runCheck = async (dir: string, opts: { scene?: string; every?: numb
     reports.push(...(await session.render(boundFrames(bounds, new Set(first), range), framesDir)));
     const scenesWithColumn = new Set(definition.scenes.filter((s) => s.texts.length > 0).map((s) => s.id));
     const { findings, problems } = analyze({ reports, fps, stepFrames, rules, layout: video.theme.layout, scenesWithColumn, accepted: readAccepted(dir) });
-    const scoped = opts.scene ? findings.filter((f) => f.scene === opts.scene || f.check === "acceptation") : findings;
+    // With --scene, only that scene was looked at: an acceptation of another scene is not orphaned.
+    const scoped = opts.scene ? findings.filter((f) => f.scene === opts.scene) : findings;
     const summary = {
       findings: scoped, problems,
       errors: scoped.filter((f) => f.level === "erreur").length,
