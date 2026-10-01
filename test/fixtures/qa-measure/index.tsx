@@ -5,7 +5,10 @@ const T: React.CSSProperties = { position: "absolute", fontSize: 32, color: "#11
 const box = (s: React.CSSProperties) => ({ position: "absolute" as const, ...s });
 const bloc = box({ left: 0, top: 0, width: 100, height: 40, background: "#2255aa" });
 
-/** Texts: their own background, inherited opacity, weight, squeezed, overflowing a little, a small overlap, a nested text. */
+/**
+ * Texts: their own background, inherited opacity, weight, squeezed, overflowing a little, a small overlap,
+ * a nested text, an opaque background over a gradient, a text under an opaque layer.
+ */
 const Texts = () => (
   <AbsoluteFill>
     <p id="badge" style={{ ...T, left: 100, top: 60, background: "#111", color: "#fff" }}>Badge sombre</p>
@@ -16,10 +19,18 @@ const Texts = () => (
     <p id="frole-a" style={{ ...T, left: 700, top: 60 }}>Il</p>
     <p id="frole-b" style={{ ...T, left: 700, top: 90 }}>Il</p>
     <div id="parent" style={{ ...T, left: 700, top: 300 }}>Texte parent<span id="enfant" style={{ position: "absolute", left: 0, top: 0 }}>Enfant</span></div>
+    <div style={box({ left: 100, top: 460, width: 400, height: 80, background: "linear-gradient(#2255aa, #aa2222)" })}>
+      <p id="sur-uni" style={{ ...T, left: 20, top: 10, background: "#fff" }}>Sur fond uni</p>
+    </div>
+    <p id="sous-voile" style={{ ...T, left: 700, top: 460 }}>Sous un voile</p>
+    <div style={box({ left: 690, top: 450, width: 300, height: 60, background: "#111" })} />
   </AbsoluteFill>
 );
 
-/** Expectations: under a transparent layer, under an invisible one, hidden, half transparent, cut by clip-path, cut by an outer box. */
+/**
+ * Expectations: under a transparent layer, under an invisible one, hidden, half transparent (with a
+ * removed sibling), cut by clip-path, cut by an outer box.
+ */
 const Blocks = () => (
   <AbsoluteFill>
     <div style={box({ left: 100, top: 100, width: 100, height: 40 })}>
@@ -32,6 +43,9 @@ const Blocks = () => (
     </div>
     <div style={box({ left: 500, top: 100 })}><Expect id="invisible" hidden={[0, 29]}><div style={{ ...bloc, visibility: "hidden" }} /></Expect></div>
     <div style={box({ left: 700, top: 100 })}><Expect id="demi" visible={[0, 29]}><div style={{ ...bloc, opacity: 0.5 }} /></Expect></div>
+    <div style={box({ left: 900, top: 100 })}>
+      <Expect id="demi-et-retire" visible={[0, 29]}><div style={{ ...bloc, opacity: 0.5 }} /><div style={{ ...bloc, display: "none" }} /></Expect>
+    </div>
     <div style={box({ left: 100, top: 300, width: 200, height: 40, clipPath: "inset(0 100px 0 0)" })}>
       <Expect id="decoupe" visible={[0, 29]}><div style={box({ left: 0, top: 0, width: 200, height: 40, background: "#2255aa" })} /></Expect>
     </div>
