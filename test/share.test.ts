@@ -66,12 +66,14 @@ describe("export puis import", () => {
     const dir = withVideo();
     mkdirSync(path.join(dir, "out"));
     writeFileSync(path.join(dir, "out/demo.raw.mp4"), "intermédiaire");
+    writeFileSync(path.join(dir, "out/demo.raw4k.mp4"), "intermédiaire au double");
     writeFileSync(path.join(dir, "out/demo.mp4"), "final");
     const zip = path.join(tmp(), "demo.rushit.zip");
     exportVideo(dir, zip);
     const entries = Object.keys(unzipSync(readFileSync(zip)));
     expect(entries).toContain("demo/out/demo.mp4");
     expect(entries).not.toContain("demo/out/demo.raw.mp4");
+    expect(entries).not.toContain("demo/out/demo.raw4k.mp4");
   });
 
   it("refuse une vidéo qui existe déjà, sauf --as", () => {
